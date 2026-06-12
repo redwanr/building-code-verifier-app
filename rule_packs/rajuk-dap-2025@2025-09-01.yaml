@@ -1,0 +1,69 @@
+# RAJUK DAP/Bidhimala planning rule pack (FAR, MGC, setbacks, parking).
+# Permissible values (permissible_far, allowable_mgc_pct, required setbacks,
+# parking_required) are USER-SUPPLIED at the confirmation gate — ward/LUC
+# specific under DAP 2025; never invented here. Blank => "cannot evaluate".
+jurisdiction: rajuk-dap-2025
+effective_date: "2025-09-01"
+source: RAJUK-DAP/Bidhimala
+
+rules:
+  - id: RAJUK-FAR-003-LIMIT
+    title: Claimed FAR within permissible FAR
+    parameters: [claimed_far, permissible_far]
+    logic: "claimed_far <= permissible_far"
+    severity: High
+    confidence_basis: "Verified principle; permissible FAR is ward/LUC-specific under DAP 2025 [VERIFY]"
+    citation: "RAJUK DAP 2022–2035 (2025 rev) / Imarat Nirman Bidhimala — area-FAR by ward/LUC"
+    remediation: "Verify claimed FAR against the plot's land-use class and current DAP ward FAR."
+    verify_flag: true
+
+  - id: RAJUK-FAR-003-CONSISTENCY
+    title: Claimed FAR consistent with floor-area / plot-area math
+    parameters: [claimed_far, total_floor_area_m2, plot_area_m2]
+    logic: "consistency([claimed_far, total_floor_area_m2 / plot_area_m2])"
+    severity: High
+    confidence_basis: "Internal arithmetic consistency — rule-independent, no external threshold"
+    citation: "RAJUK submission data table — FAR reconciliation"
+    remediation: "Reconcile the FAR figure with total floor area ÷ plot area on the sheet."
+    verify_flag: false
+
+  - id: RAJUK-MGC-004
+    title: Ground coverage (MGC) within allowable
+    parameters: [claimed_mgc_pct, allowable_mgc_pct]
+    logic: "claimed_mgc_pct <= allowable_mgc_pct"
+    severity: High
+    confidence_basis: "Verified principle; allowable % per current bracket [VERIFY]"
+    citation: "RAJUK Imarat Nirman Bidhimala — Maximum Ground Coverage by plot bracket"
+    remediation: "Reduce footprint or confirm plot bracket; reconcile MGC with allowable."
+    verify_flag: true
+
+  - id: RAJUK-SETBACK-005
+    title: Setbacks (front/rear/side) vs required schedule
+    parameters: [front_setback_m, rear_setback_m, side_setback_m,
+                 required_front_setback_m, required_rear_setback_m, required_side_setback_m]
+    logic: "front_setback_m >= required_front_setback_m and rear_setback_m >= required_rear_setback_m and side_setback_m >= required_side_setback_m"
+    severity: High
+    confidence_basis: "Verified principle; schedule in flux [VERIFY] against draft Building Rules 2025"
+    citation: "RAJUK Building Rules 2025 (draft) — setback schedule by plot size/height"
+    remediation: "Confirm setbacks meet the current schedule for this plot size and building height."
+    verify_flag: true
+
+  - id: RAJUK-PARKING-006-RATIO
+    title: Parking provided meets required count
+    parameters: [parking_provided, parking_required]
+    logic: "parking_provided >= parking_required"
+    severity: Medium
+    confidence_basis: "Verified principle; current ratio per unit size/count [VERIFY]"
+    citation: "RAJUK Bidhimala/DAP — parking provision ratio"
+    remediation: "Reconcile required vs provided parking for the unit mix."
+    verify_flag: true
+
+  - id: RAJUK-PARKING-006-CONSISTENCY
+    title: Parking table consistent with count shown on plan
+    parameters: [parking_provided_table, parking_count_on_plan]
+    logic: "consistency([parking_provided_table, parking_count_on_plan], 0.0)"
+    severity: Medium
+    confidence_basis: "Internal consistency — rule-independent, no external threshold"
+    citation: "RAJUK submission data table vs plan — parking count reconciliation"
+    remediation: "Fix the mismatch between the parking table and the count shown on plan."
+    verify_flag: false

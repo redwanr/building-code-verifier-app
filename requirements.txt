@@ -1,0 +1,8 @@
+streamlit
+pdf2image
+pillow
+anthropic
+google-genai
+simpleeval
+pyyaml
+pytest

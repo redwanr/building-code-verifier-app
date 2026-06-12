@@ -1,0 +1,58 @@
+# BNBC-2020 life-safety rule pack (egress, fire, room sizes, lifts).
+# Rules are data: edit values here, no code change (FR-10).
+# verify_flag: true => threshold depends on in-flux 2025/2026 rules; finding
+# caps at "Needs verification". All provisional values from docs/rule-catalog.md.
+jurisdiction: bnbc-2020
+effective_date: "2020-01-01"
+source: BNBC-2020
+
+rules:
+  - id: BNBC-EGRESS-001
+    title: Minimum two means of egress (high-rise)
+    parameters: [num_storeys, building_height_m, num_exit_stairs]
+    logic: "num_exit_stairs >= 2 if (building_height_m > 20 or num_storeys > 6) else True"
+    severity: Critical
+    confidence_basis: "Verified principle (BNBC Part 3 means of egress); exact trigger value [VERIFY]"
+    citation: "BNBC-2020 Part 3 — Means of Egress / number of exits"
+    remediation: "Provide a second independent, fire-separated exit stair."
+    verify_flag: true
+
+  - id: BNBC-FIRE-002
+    title: High-rise (>20 m) fire provisions for A-3 (presence check)
+    parameters: [building_height_m]
+    logic: "(param_present('has_fire_alarm') and param_present('has_fire_hydrant_standpipe') and param_present('has_fire_rated_stair_enclosure') and param_present('has_firefighting_lift')) if building_height_m > 20 else True"
+    severity: Critical
+    confidence_basis: "Verified principle (BNBC Part 4 fire protection); provision list [VERIFY]"
+    citation: "BNBC-2020 Part 4 — Fire Protection (alarm, hydrant/standpipe, rated stair enclosure, fire-fighting lift)"
+    remediation: "Add fire alarm + fixed hydrant/standpipe at stair landings & lift lobby; fire-rate the stair enclosure; provide a fire-fighting lift."
+    verify_flag: true
+
+  - id: BNBC-ROOM-007
+    title: Minimum habitable room area/width
+    parameters: [room_area_m2, room_width_m, min_room_area_m2, min_room_width_m]
+    logic: "room_area_m2 >= min_room_area_m2 and room_width_m >= min_room_width_m"
+    severity: Medium
+    confidence_basis: "Verified principle (BNBC Part 3 room sizes); exact minimums [VERIFY]"
+    citation: "BNBC-2020 Part 3 — minimum room area/width"
+    remediation: "Confirm habitable room dimensions meet BNBC minimums."
+    verify_flag: true
+
+  - id: BNBC-STAIRWIDTH-008
+    title: Minimum exit-stair width (apartments)
+    parameters: [exit_stair_width_m, min_stair_width_m]
+    logic: "exit_stair_width_m >= min_stair_width_m"
+    severity: High
+    confidence_basis: "Verified principle (BNBC Part 3 egress width); exact min width [VERIFY]"
+    citation: "BNBC-2020 Part 3 — minimum exit stair width"
+    remediation: "Confirm stair clear width meets the minimum for residential occupancy."
+    verify_flag: true
+
+  - id: BNBC-LIFT-009
+    title: Lift / fire-lift provision for height
+    parameters: [building_height_m, num_lifts]
+    logic: "(num_lifts >= 1 and param_present('has_firefighting_lift')) if building_height_m > 20 else True"
+    severity: High
+    confidence_basis: "Verified principle (BNBC lift/fire-lift for height); height threshold [VERIFY]"
+    citation: "BNBC-2020 — lift provision; fire-fighting lift for high-rise"
+    remediation: "Provide required lift(s) and a fire-fighting lift for the building height."
+    verify_flag: true
