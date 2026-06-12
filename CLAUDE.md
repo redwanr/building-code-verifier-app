@@ -21,9 +21,19 @@ System dep: `poppler` (brew) for pdf2image.
 - `extraction.py` — pdf2image → provider-switched vision call (Claude `claude-opus-4-8` default, Gemini via `GEMINI_MODEL`). Confidence < 0.7 → unconfirmed.
 - `app.py` — Streamlit flow: password gate → upload → confirmation gate → findings → export.
 
-## Project status
+## Project status & next steps (as of 2026-06-12)
 
-**MVP implemented; awaiting real permit-sheet fixtures for the provider A/B eval.** No application code exists yet. The repo contains the planning docs for a RAJUK Permit-Sheet Code Verifier MVP: upload a Dhaka building-approval drawing (flattened raster PDF), extract planning/life-safety parameters via OCR + vision-LLM, run data-driven code checks, present triaged findings for a qualified architect/engineer to review.
+**MVP implemented, 31 tests green, pushed to https://github.com/redwanr/building-code-verifier-app (private).** Full decision log in `~/.claude/plans/cozy-churning-orbit.md` (grill-me interview: Streamlit monolith, vision-LLM-only extraction, Claude Opus 4.8 default + Gemini option, simpleeval YAML rules, provisional [VERIFY] thresholds capped at needs-verification, user-supplied permissible FAR/MGC at gate, session-only persistence, MD/HTML export, shared-password gate).
+
+Next steps, in order:
+1. **Fixtures** — founder has the G+9 sheet + others; add as `fixtures/<name>.pdf` + `<name>.truth.yaml` (param: ground-truth value map). Fixtures dir is gitignored (confidential).
+2. **Secrets** — copy `.streamlit/secrets.toml.example` → `.streamlit/secrets.toml`, fill APP_PASSWORD + ANTHROPIC_API_KEY + GEMINI_API_KEY.
+3. **Verify Gemini model ID** — `GEMINI_MODEL` defaults to `gemini-3.5-flash` (user-specified, unverified). First call tells; swap env var if 404.
+4. **Provider A/B** — `.venv/bin/python eval_providers.py both`; pick production default on field accuracy (target ≥0.80 Tier-1, PRD §12).
+5. **Live extraction tuning** — iterate `EXTRACTION_PROMPT` in `extraction.py` against G+9 until the 4 known findings reproduce end-to-end through the UI.
+6. **Deploy** — Streamlit Community Cloud from the GitHub repo; secrets via app settings panel.
+
+Open items from `docs/open-questions.md` still unanswered: rule-pack value owner (Q4), go-bar confirmation (Q5). No application code exists yet. The repo contains the planning docs for a RAJUK Permit-Sheet Code Verifier MVP: upload a Dhaka building-approval drawing (flattened raster PDF), extract planning/life-safety parameters via OCR + vision-LLM, run data-driven code checks, present triaged findings for a qualified architect/engineer to review.
 
 Read these before any work:
 - `docs/PRD.md` — full product spec (FRs, schemas, pipeline, eval plan)
