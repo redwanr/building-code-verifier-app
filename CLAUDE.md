@@ -9,9 +9,29 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 .venv/bin/pytest tests/test_rules.py -q # single file
 .venv/bin/streamlit run app.py          # run app locally (needs .streamlit/secrets.toml — see secrets.toml.example)
 .venv/bin/python eval_providers.py both # Claude vs Gemini extraction accuracy (needs fixtures/*.pdf + *.truth.yaml + API keys)
+.venv/bin/python e2e_run.py "<sheet>.pdf" gemini  # headless e2e: extract→rules→findings; dumps raw JSON + crops to e2e_out/ (gitignored)
 ```
 
-System dep: `poppler` (brew) for pdf2image.
+System dep: `poppler` (brew) for pdf2image. Cloud installs it via `packages.txt`.
+
+## Dev workflow — main = production (deployed to Streamlit Community Cloud)
+
+The app is LIVE for partner testing; Streamlit auto-redeploys from `main` on every
+push (~1-2 min, via deploy webhook). So **`main` is production — never merge half-done
+work.** Follow this loop for every change:
+
+1. **Branch** off main (never commit straight to main).
+2. **Edit** code or `rule_packs/*.yaml`.
+3. **Test:** `.venv/bin/pytest tests/ -q` — must be green before merge.
+4. **Preview live behavior locally** when UI/extraction/rules changed:
+   `.venv/bin/streamlit run app.py` (localhost:8501) — catch breakage before testers do.
+5. **Commit → PR → merge to main** (squash/merge via `gh`). Merge = auto-deploy.
+6. **Rollback** a bad deploy: `git revert <commit>` → push to main → Streamlit redeploys good state.
+
+Secrets (APP_PASSWORD, GEMINI_API_KEY) live ONLY in the cloud Secrets panel + local
+`.streamlit/secrets.toml` (gitignored) — never commit them. Confidential drawings/
+fixtures/test PDFs stay gitignored. Rotate the API key + keep a billing cap since the
+URL is shared.
 
 ## Code map
 
@@ -21,19 +41,17 @@ System dep: `poppler` (brew) for pdf2image.
 - `extraction.py` — pdf2image → provider-switched vision call (Claude `claude-opus-4-8` default, Gemini via `GEMINI_MODEL`). Confidence < 0.7 → unconfirmed.
 - `app.py` — Streamlit flow: password gate → upload → confirmation gate → findings → export.
 
-## Project status & next steps (as of 2026-06-12)
+## Project status & next steps (as of 2026-06-17)
 
-**MVP implemented, 31 tests green, pushed to https://github.com/redwanr/building-code-verifier-app (private).** Full decision log in `~/.claude/plans/cozy-churning-orbit.md` (grill-me interview: Streamlit monolith, vision-LLM-only extraction, Claude Opus 4.8 default + Gemini option, simpleeval YAML rules, provisional [VERIFY] thresholds capped at needs-verification, user-supplied permissible FAR/MGC at gate, session-only persistence, MD/HTML export, shared-password gate).
+**MVP implemented and DEPLOYED LIVE to Streamlit Community Cloud for partner testing (2026-06-17).** Tests green, repo at https://github.com/redwanr/building-code-verifier-app (private). Full decision log in `~/.claude/plans/cozy-churning-orbit.md` (grill-me interview: Streamlit monolith, vision-LLM-only extraction, Claude Opus 4.8 default + Gemini option, simpleeval YAML rules, provisional [VERIFY] thresholds capped at needs-verification, user-supplied permissible FAR/MGC at gate, session-only persistence, MD/HTML export, shared-password gate). Sidebar provider defaults to **gemini** (cloud secrets only carry a Gemini key). Gemini `gemini-3.5-flash` VERIFIED working e2e against the real firm sheet `tests/Uttara15C1 _ architectural.pdf` (gitignored). Done since 06-12: ✅ secrets, ✅ Gemini model verified, ✅ deploy. Partner explainer: `docs/How-The-MVP-Works.docx`.
 
 Next steps, in order:
-1. **Fixtures** — founder has the G+9 sheet + others; add as `fixtures/<name>.pdf` + `<name>.truth.yaml` (param: ground-truth value map). Fixtures dir is gitignored (confidential).
-2. **Secrets** — copy `.streamlit/secrets.toml.example` → `.streamlit/secrets.toml`, fill APP_PASSWORD + ANTHROPIC_API_KEY + GEMINI_API_KEY.
-3. **Verify Gemini model ID** — `GEMINI_MODEL` defaults to `gemini-3.5-flash` (user-specified, unverified). First call tells; swap env var if 404.
-4. **Provider A/B** — `.venv/bin/python eval_providers.py both`; pick production default on field accuracy (target ≥0.80 Tier-1, PRD §12).
-5. **Live extraction tuning** — iterate `EXTRACTION_PROMPT` in `extraction.py` against G+9 until the 4 known findings reproduce end-to-end through the UI.
-6. **Deploy** — Streamlit Community Cloud from the GitHub repo; secrets via app settings panel.
+1. **Fixtures + accuracy** — add validation sheets as `fixtures/<name>.pdf` + `<name>.truth.yaml`; run `eval_providers.py` to measure field accuracy (target ≥0.80 Tier-1, PRD §12). No truth file exists for the Uttara sheet yet.
+2. **Provider A/B** — `.venv/bin/python eval_providers.py both`; revisit production default (currently gemini by necessity, not measured accuracy).
+3. **Live extraction tuning** — iterate `EXTRACTION_PROMPT` in `extraction.py`; note observed run-to-run non-determinism on the same sheet (recall-critical — consider multi-pass reconcile).
+4. **Rule thresholds** — 9 of 11 rules carry `verify_flag` (provisional [VERIFY]); domain expert must confirm 2025/2026 values to unlock hard red/green beyond the 2 consistency rules.
 
-Open items from `docs/open-questions.md` still unanswered: rule-pack value owner (Q4), go-bar confirmation (Q5). No application code exists yet. The repo contains the planning docs for a RAJUK Permit-Sheet Code Verifier MVP: upload a Dhaka building-approval drawing (flattened raster PDF), extract planning/life-safety parameters via OCR + vision-LLM, run data-driven code checks, present triaged findings for a qualified architect/engineer to review.
+Open items from `docs/open-questions.md` still unanswered: rule-pack value owner (Q4), go-bar confirmation (Q5). Product: a RAJUK Permit-Sheet Code Verifier MVP — upload a Dhaka building-approval drawing (flattened raster PDF), extract planning/life-safety parameters via vision-LLM (no OCR engine — vision-only), run data-driven code checks, present triaged findings for a qualified architect/engineer to review.
 
 Read these before any work:
 - `docs/PRD.md` — full product spec (FRs, schemas, pipeline, eval plan)
