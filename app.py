@@ -48,7 +48,8 @@ def password_gate() -> bool:
 
 
 def provider_config():
-    provider = st.sidebar.selectbox("Extraction provider", ["claude", "gemini"])
+    # gemini first = default: cloud deploy only has a Gemini key in secrets.
+    provider = st.sidebar.selectbox("Extraction provider", ["gemini", "claude"])
     key_name = "ANTHROPIC_API_KEY" if provider == "claude" else "GEMINI_API_KEY"
     api_key = st.secrets.get(key_name, "")
     if not api_key:
