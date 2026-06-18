@@ -2,5 +2,7 @@
 __pycache__/
 .streamlit/secrets.toml
 fixtures/
+e2e_out/
+tests/*.pdf
 *.pyc
 .DS_Store
