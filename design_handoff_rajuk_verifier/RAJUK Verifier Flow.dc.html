@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0}
+  ::-webkit-scrollbar{height:11px;width:11px}
+  ::-webkit-scrollbar-thumb{background:#c4c0b3;border-radius:8px;border:3px solid #efece4}
+</style>
+</helmet>
+
+<div style="font-family:Kalam,cursive;min-height:100vh;background:#efece4;color:#2b2b2b;padding:34px 40px;display:flex;flex-direction:column;align-items:center;gap:14px">
+
+  <div style="width:1180px;max-width:100%;display:flex;align-items:flex-end;justify-content:space-between;gap:20px">
+    <div>
+      <div style="font-family:Caveat,cursive;font-size:30px;font-weight:700;line-height:1">RAJUK Permit-Sheet Verifier — connected flow</div>
+      <div style="font-size:13px;color:#6b6859;margin-top:2px">Chosen approaches: Upload C · Confirm A · Findings B · Inspect C · Export B</div>
+    </div>
+    <div style="font-family:Caveat,cursive;font-size:15px;color:#c0392b;max-width:280px;text-align:right;line-height:1.1">click the rail or Next to walk the flow →</div>
+  </div>
+
+  <div style="width:1180px;max-width:100%;background:#fff;border:2px solid #2b2b2b;border-radius:16px 13px 18px 13px;box-shadow:5px 6px 0 rgba(43,43,43,.12);overflow:hidden;display:flex;flex-direction:column">
+
+    <!-- browser chrome -->
+    <div style="display:flex;align-items:center;gap:7px;padding:9px 13px;border-bottom:2px solid #2b2b2b;background:#f4f2eb">
+      <div style="width:10px;height:10px;border-radius:50%;border:1.5px solid #2b2b2b"></div>
+      <div style="width:10px;height:10px;border-radius:50%;border:1.5px solid #2b2b2b"></div>
+      <div style="width:10px;height:10px;border-radius:50%;border:1.5px solid #2b2b2b"></div>
+      <div style="flex:1;height:17px;background:#e6e3da;border:1.5px solid #b8b5a8;border-radius:8px;margin-left:5px;display:flex;align-items:center;padding:0 9px;font-size:10px;color:#8a8678">verifier.local / submission / mirpur-g9</div>
+    </div>
+    <sc-if value="{{ showDisclaimer }}" hint-placeholder-val="{{ true }}"><div style="padding:6px 14px;background:#faf0d6;border-bottom:2px dashed #c8920f;font-size:11px;color:#7a5a08;line-height:1.25">⚠ Decision-support only — not a certification. This tool triages possible code issues for review by a licensed architect/engineer. It does not approve or certify anything.</div></sc-if>
+
+    <div style="display:flex;min-height:600px">
+
+      <!-- persistent step rail -->
+      <div style="width:178px;flex:none;background:#f4f2eb;border-right:2px solid #2b2b2b;padding:16px 12px;display:flex;flex-direction:column;gap:6px">
+        <div style="font-size:10.5px;color:#9a978b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Submission flow</div>
+        <sc-for list="{{ rail }}" as="r" hint-placeholder-count="5">
+          <div onClick="{{ r.on }}" style="{{ r.rowStyle }}"><span style="{{ r.circleStyle }}">{{ r.mark }}</span>{{ r.label }}</div>
+        </sc-for>
+        <div style="margin-top:auto;font-size:10px;color:#9a978b;line-height:1.3;padding:8px 6px 0">Uploads &amp; crops deleted after the session — no permanent archive.</div>
+      </div>
+
+      <!-- content -->
+      <div style="flex:1;display:flex;flex-direction:column">
+        <div style="flex:1;padding:20px 22px">
+
+          <!-- STEP 1 · UPLOAD (C) -->
+          <sc-if value="{{ isUpload }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:15px;height:100%">
+            <div style="font-family:Caveat,cursive;font-size:23px;font-weight:700">New submission</div>
+            <div style="display:flex;gap:18px;flex:1">
+              <div style="flex:1.2;display:flex;flex-direction:column;gap:13px">
+                <div style="border:2px dashed #2b2b2b;border-radius:170px 16px 190px 16px/16px 190px 16px 170px;background:#faf9f4;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;text-align:center;padding:26px">
+                  <div style="font-size:36px">⬆</div>
+                  <div style="font-family:Caveat,cursive;font-size:24px;font-weight:700">Drop permit-sheet PDF here</div>
+                  <button style="border:2px solid #2b2b2b;background:#fff;border-radius:9px 7px 11px 7px;padding:8px 17px;font-family:Kalam,cursive;font-weight:700;font-size:13px;cursor:pointer">or browse files</button>
+                  <div style="font-size:11px;color:#8a8678">PDF · raster ok (no text layer) · ≤ 2 pages · ≤ 25 MB</div>
+                </div>
+                <div style="display:flex;gap:11px">
+                  <div style="flex:1"><div style="font-size:11px;color:#6b6859;margin-bottom:3px">Jurisdiction / rule pack</div><div style="border:2px solid #2b2b2b;border-radius:9px;background:#fff;padding:9px 11px;font-size:12px;display:flex;justify-content:space-between">RAJUK DAP 2025 + BNBC-2020 <span>▾</span></div></div>
+                  <div style="flex:1"><div style="font-size:11px;color:#6b6859;margin-bottom:3px">Effective date</div><div style="border:2px solid #2b2b2b;border-radius:9px;background:#fff;padding:9px 11px;font-size:12px;display:flex;justify-content:space-between">2025-09-01 <span>▾</span></div></div>
+                </div>
+              </div>
+              <div style="width:280px;flex:none;display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:12px;color:#6b6859">Recent submissions</div>
+                <div style="display:flex;gap:11px;align-items:center;border:2px solid #2b2b2b;border-radius:11px;padding:9px"><div style="width:38px;height:50px;background:repeating-linear-gradient(45deg,#eeece4,#eeece4 6px,#e1ded2 6px,#e1ded2 12px);border:1.5px solid #9a978b;border-radius:3px"></div><div style="flex:1"><div style="font-size:12.5px;font-weight:700">Mirpur G+9 block.pdf</div><div style="font-size:10.5px;color:#8a8678">2026-06-12</div></div><span style="font-size:10px;font-weight:700;color:#c0392b;background:#f8e3df;border-radius:7px;padding:3px 7px">1 critical</span></div>
+                <div style="display:flex;gap:11px;align-items:center;border:2px solid #2b2b2b;border-radius:11px;padding:9px"><div style="width:38px;height:50px;background:repeating-linear-gradient(45deg,#eeece4,#eeece4 6px,#e1ded2 6px,#e1ded2 12px);border:1.5px solid #9a978b;border-radius:3px"></div><div style="flex:1"><div style="font-size:12.5px;font-weight:700">Uttara 6-storey.pdf</div><div style="font-size:10.5px;color:#8a8678">2026-06-09</div></div><span style="font-size:10px;font-weight:700;color:#2e7d4f;background:#dff0e4;border-radius:7px;padding:3px 7px">clear</span></div>
+                <div style="margin-top:6px;font-family:Caveat,cursive;font-size:15px;color:#7a5a08;background:#faf0d6;border-radius:8px;padding:8px 10px;line-height:1.15">Rule pack &amp; date are recorded on every report — reproducible against a dated gazette.</div>
+              </div>
+            </div>
+          </div>
+          </sc-if>
+
+          <!-- STEP 2 · CONFIRM (A) -->
+          <sc-if value="{{ isConfirm }}">
+          <div style="display:flex;flex-direction:column;gap:13px;height:100%">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-family:Caveat,cursive;font-size:23px;font-weight:700">Confirm extracted parameters</div>
+              <span style="{{ confirmPillStyle }}">{{ confirmMsg }}</span>
+            </div>
+            <div style="font-size:11.5px;color:#6b6859;margin-top:-6px">Checks won't run until every flagged field is confirmed — no manufactured confidence.</div>
+            <div style="border:2px solid #2b2b2b;border-radius:11px;overflow:hidden;font-size:12px">
+              <div style="display:flex;padding:8px 14px;background:#f4f2eb;border-bottom:2px solid #2b2b2b;font-weight:700;color:#6b6859"><div style="flex:1.6">Field</div><div style="width:70px">Value</div><div style="width:120px">Confidence</div><div style="width:54px">Crop</div><div style="width:90px;text-align:center">Confirm</div></div>
+              <div style="display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid #e5e2d8"><div style="flex:1.6">num_storeys</div><div style="width:70px;font-weight:700">10</div><div style="width:120px;display:flex;align-items:center;gap:5px"><div style="flex:1;height:7px;background:#dff0e4;border-radius:4px;overflow:hidden"><div style="width:95%;height:100%;background:#2e7d4f"></div></div>.95</div><div style="width:54px"><div style="width:30px;height:20px;background:repeating-linear-gradient(45deg,#eeece4,#eeece4 4px,#e1ded2 4px,#e1ded2 8px);border:1px solid #9a978b;border-radius:2px"></div></div><div style="width:90px;text-align:center;color:#2e7d4f;font-weight:700">auto ✓</div></div>
+              <div style="display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid #e5e2d8;background:#fdf8ec"><div style="flex:1.6;font-weight:700">claimed_far ⚑</div><div style="width:70px"><span style="border:1.5px solid #c8920f;border-radius:4px;padding:2px 6px;background:#fff">4.2</span></div><div style="width:120px;display:flex;align-items:center;gap:5px"><div style="flex:1;height:7px;background:#faf0d6;border-radius:4px;overflow:hidden"><div style="width:62%;height:100%;background:#c8920f"></div></div>.62</div><div style="width:54px"><div style="width:30px;height:20px;background:repeating-linear-gradient(45deg,#eeece4,#eeece4 4px,#e1ded2 4px,#e1ded2 8px);border:1px solid #9a978b;border-radius:2px"></div></div><div style="width:90px;display:flex;justify-content:center"><span onClick="{{ toggleFar }}" style="{{ farChkStyle }}">{{ farChkMark }}</span></div></div>
+              <div style="display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid #e5e2d8"><div style="flex:1.6">claimed_mgc</div><div style="width:70px;font-weight:700">58%</div><div style="width:120px;display:flex;align-items:center;gap:5px"><div style="flex:1;height:7px;background:#dff0e4;border-radius:4px;overflow:hidden"><div style="width:88%;height:100%;background:#2e7d4f"></div></div>.88</div><div style="width:54px"><div style="width:30px;height:20px;background:repeating-linear-gradient(45deg,#eeece4,#eeece4 4px,#e1ded2 4px,#e1ded2 8px);border:1px solid #9a978b;border-radius:2px"></div></div><div style="width:90px;text-align:center;color:#2e7d4f;font-weight:700">auto ✓</div></div>
+              <div style="display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid #e5e2d8;background:#fdf2ef"><div style="flex:1.6;font-weight:700">num_exit_stairs ⚑</div><div style="width:70px"><span style="border:1.5px solid #c0392b;border-radius:4px;padding:2px 6px;background:#fff">1</span></div><div style="width:120px;display:flex;align-items:center;gap:5px"><div style="flex:1;height:7px;background:#f8e3df;border-radius:4px;overflow:hidden"><div style="width:55%;height:100%;background:#c0392b"></div></div>.55</div><div style="width:54px"><div style="width:30px;height:20px;background:repeating-linear-gradient(45deg,#eeece4,#eeece4 4px,#e1ded2 4px,#e1ded2 8px);border:1px solid #9a978b;border-radius:2px"></div></div><div style="width:90px;display:flex;justify-content:center"><span onClick="{{ toggleStairs }}" style="{{ stairChkStyle }}">{{ stairChkMark }}</span></div></div>
+              <div style="display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid #e5e2d8"><div style="flex:1.6">parking_provided / required</div><div style="width:70px;font-weight:700">8 / 12</div><div style="width:120px;display:flex;align-items:center;gap:5px"><div style="flex:1;height:7px;background:#dff0e4;border-radius:4px;overflow:hidden"><div style="width:90%;height:100%;background:#2e7d4f"></div></div>.90</div><div style="width:54px"><div style="width:30px;height:20px;background:repeating-linear-gradient(45deg,#eeece4,#eeece4 4px,#e1ded2 4px,#e1ded2 8px);border:1px solid #9a978b;border-radius:2px"></div></div><div style="width:90px;text-align:center;color:#2e7d4f;font-weight:700">auto ✓</div></div>
+              <div style="display:flex;align-items:center;padding:11px 14px"><div style="flex:1.6">unit_count</div><div style="width:70px;font-weight:700">36</div><div style="width:120px;display:flex;align-items:center;gap:5px"><div style="flex:1;height:7px;background:#dff0e4;border-radius:4px;overflow:hidden"><div style="width:84%;height:100%;background:#2e7d4f"></div></div>.84</div><div style="width:54px"><div style="width:30px;height:20px;background:repeating-linear-gradient(45deg,#eeece4,#eeece4 4px,#e1ded2 4px,#e1ded2 8px);border:1px solid #9a978b;border-radius:2px"></div></div><div style="width:90px;text-align:center;color:#2e7d4f;font-weight:700">auto ✓</div></div>
+            </div>
+            <div style="font-size:10.5px;color:#8a8678">Every edit (original → corrected) is stored in the audit trail.</div>
+          </div>
+          </sc-if>
+
+          <!-- STEP 3 · FINDINGS (B) -->
+          <sc-if value="{{ isFindings }}">
+          <div style="display:flex;flex-direction:column;gap:13px;height:100%">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-family:Caveat,cursive;font-size:23px;font-weight:700">Triaged findings</div>
+              <div style="display:flex;gap:6px"><span style="font-size:11px;font-weight:700;color:#c0392b;background:#f8e3df;border-radius:7px;padding:3px 8px">2 likely</span><span style="font-size:11px;font-weight:700;color:#7a5a08;background:#faf0d6;border-radius:7px;padding:3px 8px">3 verify</span><span style="font-size:11px;font-weight:700;color:#2e7d4f;background:#dff0e4;border-radius:7px;padding:3px 8px">3 ok</span></div>
+            </div>
+            <div style="display:flex;gap:7px;flex-wrap:wrap">
+              <span style="font-size:11.5px;font-weight:700;background:#2b2b2b;color:#fff;border-radius:20px;padding:5px 13px">All 6</span>
+              <span style="font-size:11.5px;font-weight:700;border:2px solid #2b2b2b;border-radius:20px;padding:4px 12px">Critical</span>
+              <span style="font-size:11.5px;font-weight:700;border:2px solid #2b2b2b;border-radius:20px;padding:4px 12px">BNBC</span>
+              <span style="font-size:11.5px;font-weight:700;border:2px solid #2b2b2b;border-radius:20px;padding:4px 12px">RAJUK</span>
+              <span style="font-size:11.5px;font-weight:700;border:2px solid #2b2b2b;border-radius:20px;padding:4px 12px">Needs verification</span>
+            </div>
+            <div style="border:2px solid #2b2b2b;border-radius:11px;overflow:hidden">
+              <div onClick="{{ openFinding }}" style="display:flex;align-items:center;gap:11px;padding:12px 15px;border-bottom:1px solid #e5e2d8;border-left:5px solid #c0392b;cursor:pointer;background:#fff"><div style="width:11px;height:11px;border-radius:50%;background:#c0392b"></div><div style="flex:1"><div style="font-size:13px;font-weight:700">Single stair on G+9 — needs 2nd fire-separated exit</div><div style="font-size:10.5px;color:#8a8678">BNBC-2020 Part 3/4 · means of egress</div></div><span style="font-size:9.5px;font-weight:700;color:#c0392b;background:#f8e3df;border-radius:6px;padding:2px 7px">CRITICAL</span><span style="font-size:10px;color:#8a8678">.74</span><span style="font-size:14px;color:#9a978b">›</span></div>
+              <div onClick="{{ openFinding }}" style="display:flex;align-items:center;gap:11px;padding:12px 15px;border-bottom:1px solid #e5e2d8;border-left:5px solid #c0392b;cursor:pointer"><div style="width:11px;height:11px;border-radius:50%;background:#c0392b"></div><div style="flex:1"><div style="font-size:13px;font-weight:700">Claimed FAR 4.2 exceeds ward density cap</div><div style="font-size:10.5px;color:#8a8678">RAJUK DAP 2025 · ward / density block</div></div><span style="font-size:9.5px;font-weight:700;color:#c0392b;background:#f8e3df;border-radius:6px;padding:2px 7px">HIGH</span><span style="font-size:10px;color:#8a8678">.81</span><span style="font-size:14px;color:#9a978b">›</span></div>
+              <div style="display:flex;align-items:center;gap:11px;padding:12px 15px;border-bottom:1px solid #e5e2d8;border-left:5px solid #c8920f"><div style="width:11px;height:11px;border-radius:50%;background:#c8920f"></div><div style="flex:1"><div style="font-size:13px;font-weight:700">High-rise fire provisions not found</div><div style="font-size:10.5px;color:#8a8678">BNBC · input missing → cannot evaluate</div></div><span style="font-size:9.5px;font-weight:700;color:#7a5a08;background:#faf0d6;border-radius:6px;padding:2px 7px">VERIFY</span><span style="font-size:14px;color:#9a978b">›</span></div>
+              <div style="display:flex;align-items:center;gap:11px;padding:12px 15px;border-bottom:1px solid #e5e2d8;border-left:5px solid #c8920f"><div style="width:11px;height:11px;border-radius:50%;background:#c8920f"></div><div style="flex:1"><div style="font-size:13px;font-weight:700">Parking provided 8 vs required 12</div><div style="font-size:10.5px;color:#8a8678">RAJUK · low-confidence input</div></div><span style="font-size:9.5px;font-weight:700;color:#7a5a08;background:#faf0d6;border-radius:6px;padding:2px 7px">VERIFY</span><span style="font-size:14px;color:#9a978b">›</span></div>
+              <div style="display:flex;align-items:center;gap:11px;padding:12px 15px;border-bottom:1px solid #e5e2d8;border-left:5px solid #2e7d4f"><div style="width:11px;height:11px;border-radius:50%;background:#2e7d4f"></div><div style="flex:1"><div style="font-size:13px;font-weight:700">Ground coverage 58% within MGC</div><div style="font-size:10.5px;color:#8a8678">RAJUK</div></div><span style="font-size:9.5px;font-weight:700;color:#2e7d4f;background:#dff0e4;border-radius:6px;padding:2px 7px">OK</span></div>
+              <div style="display:flex;align-items:center;gap:11px;padding:12px 15px;border-left:5px solid #2e7d4f"><div style="width:11px;height:11px;border-radius:50%;background:#2e7d4f"></div><div style="flex:1"><div style="font-size:13px;font-weight:700">Lift count meets minimum</div><div style="font-size:10.5px;color:#8a8678">BNBC</div></div><span style="font-size:9.5px;font-weight:700;color:#2e7d4f;background:#dff0e4;border-radius:6px;padding:2px 7px">OK</span></div>
+            </div>
+          </div>
+          </sc-if>
+
+          <!-- STEP 4 · INSPECT (C) -->
+          <sc-if value="{{ isInspect }}">
+          <div style="display:flex;flex-direction:column;gap:13px;height:100%">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div onClick="{{ backToFindings }}" style="font-size:12px;color:#6b6859;cursor:pointer">‹ back to findings</div>
+              <span style="font-size:11px;font-weight:700">Finding 1 of 6</span>
+            </div>
+            <div style="border:2px solid #2b2b2b;border-radius:12px;overflow:hidden;display:flex;flex:1">
+              <div style="flex:1.05;padding:18px;display:flex;flex-direction:column;gap:12px;border-right:2px dashed #cbc8bb">
+                <div style="display:flex;gap:7px;align-items:center"><span style="font-size:10.5px;font-weight:700;color:#c0392b;background:#f8e3df;border-radius:6px;padding:3px 8px">CRITICAL</span><span style="font-size:10.5px;font-weight:700;background:#ece9df;border-radius:6px;padding:3px 8px">BNBC</span><span style="font-size:10.5px;color:#8a8678">confidence 0.74</span></div>
+                <div style="font-family:Caveat,cursive;font-size:24px;font-weight:700;line-height:1.05">Single stair on a G+9 / ~30 m block</div>
+                <div style="font-size:13px;line-height:1.45">Building is 10 storeys (~30 m) but only one stair is shown. High-rise occupancy requires at least two fire-separated exit stairs.</div>
+                <div style="font-size:11.5px;background:#f4f2eb;border-left:3px solid #2b2b2b;padding:8px 11px;line-height:1.35"><b>Clause</b><br>BNBC-2020 Part 3 &amp; 4 — means of egress / number of exits</div>
+                <div style="font-size:11.5px;background:#eef6f0;border-left:3px solid #2e7d4f;padding:8px 11px;line-height:1.35"><b>Suggested fix</b><br>Add a second, fire-separated exit stair.</div>
+                <div style="font-size:10.5px;color:#8a8678">Inputs used: num_storeys 10 · num_exit_stairs 1</div>
+              </div>
+              <div style="width:240px;flex:none;padding:16px;display:flex;flex-direction:column;gap:11px;background:#faf9f4">
+                <div style="font-size:11px;color:#6b6859">Sheet location · page 1</div>
+                <div style="flex:1;min-height:150px;background:repeating-linear-gradient(45deg,#eeece4,#eeece4 8px,#e1ded2 8px,#e1ded2 16px);border:2px solid #2b2b2b;border-radius:6px;display:flex;align-items:center;justify-content:center"><span style="font-family:monospace;font-size:10px;background:#fff;padding:3px 6px;border-radius:3px">stair-plan crop</span></div>
+                <button style="font-family:Kalam,cursive;font-weight:700;font-size:12px;padding:8px;background:#fff;border:2px solid #2b2b2b;border-radius:8px;cursor:pointer">Open full sheet</button>
+              </div>
+            </div>
+            <div style="display:flex;gap:11px;align-items:center"><button style="font-family:Kalam,cursive;font-weight:700;font-size:13px;padding:9px 18px;background:#2b2b2b;color:#fff;border:none;border-radius:10px 8px 12px 8px;cursor:pointer">Accept finding</button><button style="font-family:Kalam,cursive;font-weight:700;font-size:13px;padding:9px 18px;background:#fff;border:2px solid #2b2b2b;border-radius:10px 8px 12px 8px;cursor:pointer">Dismiss</button><div style="flex:1;border:2px solid #cbc8bb;border-radius:8px;padding:9px 11px;font-size:11.5px;color:#8a8678">add a note for the report…</div></div>
+          </div>
+          </sc-if>
+
+          <!-- STEP 5 · EXPORT (B) -->
+          <sc-if value="{{ isExport }}">
+          <div style="display:flex;flex-direction:column;gap:13px;height:100%">
+            <div style="font-family:Caveat,cursive;font-size:23px;font-weight:700">Build &amp; export report</div>
+            <div style="display:flex;gap:20px;flex:1">
+              <div style="flex:1;display:flex;flex-direction:column;gap:12px;border-right:2px dashed #cbc8bb;padding-right:20px">
+                <div style="font-size:11.5px;color:#6b6859">Format</div>
+                <div style="display:flex;gap:9px"><span style="font-size:12px;font-weight:700;border:2px solid #2b2b2b;border-radius:8px;padding:6px 13px;background:#2b2b2b;color:#fff">PDF ✓</span><span style="font-size:12px;font-weight:700;border:2px solid #2b2b2b;border-radius:8px;padding:6px 13px">Markdown</span></div>
+                <div style="font-size:11.5px;color:#6b6859;margin-top:6px">Include</div>
+                <div style="display:flex;align-items:center;gap:9px;font-size:12.5px"><span style="width:17px;height:17px;background:#2b2b2b;border-radius:4px;color:#fff;text-align:center;font-size:11px;line-height:17px">✓</span>Risk summary (counts by severity)</div>
+                <div style="display:flex;align-items:center;gap:9px;font-size:12.5px"><span style="width:17px;height:17px;background:#2b2b2b;border-radius:4px;color:#fff;text-align:center;font-size:11px;line-height:17px">✓</span>Full findings list + accept/dismiss notes</div>
+                <div style="display:flex;align-items:center;gap:9px;font-size:12.5px"><span style="width:17px;height:17px;background:#2b2b2b;border-radius:4px;color:#fff;text-align:center;font-size:11px;line-height:17px">✓</span>Parameters used</div>
+                <div style="display:flex;align-items:center;gap:9px;font-size:12.5px"><span style="width:17px;height:17px;border:2px solid #2b2b2b;border-radius:4px"></span>Evidence crops <span style="font-size:10px;color:#8a8678">(confidential)</span></div>
+                <div style="display:flex;align-items:center;gap:9px;font-size:12.5px;color:#8a8678"><span style="width:17px;height:17px;background:#bdbab0;border-radius:4px;color:#fff;text-align:center;font-size:10px;line-height:17px">🔒</span>Disclaimer + rule-pack version (locked on)</div>
+              </div>
+              <div style="width:300px;flex:none;display:flex;flex-direction:column;gap:11px">
+                <div style="font-size:11.5px;color:#6b6859">Preview</div>
+                <div style="flex:1;background:#e7e4db;border-radius:6px;padding:14px;display:flex;justify-content:center">
+                  <div style="width:100%;background:#fff;border:1px solid #c4c0b3;box-shadow:0 2px 6px rgba(0,0,0,.12);padding:13px;display:flex;flex-direction:column;gap:7px">
+                    <div style="font-family:Caveat,cursive;font-size:15px;font-weight:700">Permit-sheet triage report</div>
+                    <div style="font-size:8px;background:#faf0d6;border:1px dashed #c8920f;padding:4px 6px;color:#7a5a08;line-height:1.25">⚠ Decision-support only — not a certification.</div>
+                    <div style="font-size:8.5px;color:#6b6859">bnbc-2020@2020-01-01 · rajuk-dap-2025@2025-09-01</div>
+                    <div style="display:flex;gap:5px;font-size:9px;font-weight:700"><span style="color:#c0392b">2 likely</span><span style="color:#c8920f">3 verify</span><span style="color:#2e7d4f">3 ok</span></div>
+                    <div style="height:1px;background:#e5e2d8"></div>
+                    <div style="font-size:9px;font-weight:700;color:#c0392b">🔴 Single stair G+9 — Critical</div>
+                    <div style="height:7px;background:#f8e3df;border-radius:3px;width:85%"></div>
+                    <div style="height:7px;background:#ece9df;border-radius:3px;width:70%"></div>
+                    <div style="height:7px;background:#ece9df;border-radius:3px;width:55%"></div>
+                  </div>
+                </div>
+                <button style="font-family:Kalam,cursive;font-weight:700;font-size:14px;padding:11px;background:#2b2b2b;color:#fff;border:none;border-radius:10px 8px 12px 8px;cursor:pointer">Export report →</button>
+              </div>
+            </div>
+          </div>
+          </sc-if>
+
+        </div>
+
+        <!-- footer nav -->
+        <div style="border-top:2px solid #2b2b2b;background:#f4f2eb;padding:12px 22px;display:flex;align-items:center;justify-content:space-between">
+          <button onClick="{{ back }}" style="{{ backBtnStyle }}">‹ Back</button>
+          <div style="font-size:11.5px;color:#6b6859">{{ stepName }}</div>
+          <sc-if value="{{ isConfirm }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ runChecks }}" style="{{ runBtnStyle }}">Run checks →</button>
+          </sc-if>
+          <sc-if value="{{ showPlainNext }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ next }}" style="{{ nextBtnStyle }}">{{ nextLabel }}</button>
+          </sc-if>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:820},&quot;showDisclaimer&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { step: 0, confFar: false, confStairs: false };
+
+  renderVals() {
+    const step = this.state.step;
+    const set = (i) => () => this.setState({ step: i });
+    const names = ["Upload", "Confirm", "Findings", "Inspect", "Export"];
+
+    const rail = names.map((label, i) => ({
+      label,
+      mark: i < step ? "✓" : String(i + 1),
+      on: set(i),
+      rowStyle: `display:flex;gap:9px;align-items:center;font-size:12.5px;cursor:pointer;padding:7px 9px;border-radius:8px;font-weight:${i === step ? 700 : 400};color:${i <= step ? "#2b2b2b" : "#9a978b"};background:${i === step ? "#fff" : "transparent"};border:2px solid ${i === step ? "#2b2b2b" : "transparent"}`,
+      circleStyle: `width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:none;border:2px solid ${i <= step ? "#2b2b2b" : "#b8b5a8"};background:${i === step ? "#2b2b2b" : i < step ? "#2e7d4f" : "#fff"};color:${i < step || i === step ? "#fff" : "#9a978b"}`,
+    }));
+
+    const canRun = this.state.confFar && this.state.confStairs;
+    const need = (this.state.confFar ? 0 : 1) + (this.state.confStairs ? 0 : 1);
+
+    const chk = (on) => `width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;font-weight:700;border:2px solid ${on ? "#2e7d4f" : "#c0392b"};background:${on ? "#2e7d4f" : "#fff"};color:#fff`;
+
+    const primaryBtn = (enabled) => `font-family:Kalam,cursive;font-weight:700;font-size:13px;padding:9px 18px;border:none;border-radius:10px 8px 12px 8px;background:${enabled ? "#2b2b2b" : "#bdbab0"};color:#fff;cursor:${enabled ? "pointer" : "not-allowed"}`;
+
+    return {
+      rail,
+      isUpload: step === 0, isConfirm: step === 1, isFindings: step === 2, isInspect: step === 3, isExport: step === 4,
+      showPlainNext: step !== 1 && step !== 4,
+      stepName: `Step ${step + 1} of 5 · ${names[step]}`,
+      back: () => this.setState({ step: Math.max(0, step - 1) }),
+      next: () => this.setState({ step: Math.min(4, step + 1) }),
+      nextLabel: step === 3 ? "Export →" : "Next →",
+      runChecks: () => { if (canRun) this.setState({ step: 2 }); },
+      openFinding: () => this.setState({ step: 3 }),
+      backToFindings: () => this.setState({ step: 2 }),
+      toggleFar: () => this.setState((s) => ({ confFar: !s.confFar })),
+      toggleStairs: () => this.setState((s) => ({ confStairs: !s.confStairs })),
+      farChkMark: this.state.confFar ? "✓" : "", farChkStyle: chk(this.state.confFar),
+      stairChkMark: this.state.confStairs ? "✓" : "", stairChkStyle: chk(this.state.confStairs),
+      confirmMsg: canRun ? "All fields confirmed ✓" : `${need} field${need === 1 ? "" : "s"} need confirmation`,
+      confirmPillStyle: `font-size:11px;font-weight:700;border-radius:7px;padding:4px 9px;color:${canRun ? "#2e7d4f" : "#7a5a08"};background:${canRun ? "#dff0e4" : "#faf0d6"}`,
+      backBtnStyle: `font-family:Kalam,cursive;font-weight:700;font-size:13px;padding:9px 16px;border:2px solid #2b2b2b;border-radius:10px 8px 12px 8px;background:#fff;cursor:pointer;visibility:${step === 0 ? "hidden" : "visible"}`,
+      nextBtnStyle: primaryBtn(true),
+      runBtnStyle: primaryBtn(canRun),
+      showDisclaimer: this.props.showDisclaimer ?? true,
+    };
+  }
+}
+</script>
+</body>
+</html>
