@@ -2,8 +2,11 @@
 
 5-step wizard (PRD §5): password gate -> [Upload -> Confirm -> Findings ->
 Inspect -> Export]. Session-state only; nothing persists beyond the session
-(PRD §14). UI restyled per design_handoff_rajuk_verifier — sketch aesthetic
-applied via injected CSS; the real extraction/rules/export pipeline is unchanged.
+(PRD §14).
+
+UI: "drafting instrument" direction — cool neutrals + one structural-blue
+accent, Space Grotesk display, IBM Plex Mono for every measured value. Sketch
+aesthetic dropped. Real extraction/rules/export pipeline unchanged.
 """
 
 import tempfile
@@ -15,14 +18,17 @@ from report import DISCLAIMER, BUCKETS, BUCKET_LABELS, ExtractedParam, \
     new_report, render_html, render_markdown
 from rules import evaluate_rules, load_packs, PACK_DIR
 
-st.set_page_config(page_title="RAJUK Code Verifier (MVP)", page_icon="📐",
+st.set_page_config(page_title="RAJUK Code Verifier", page_icon="◳",
                    layout="wide")
 
-# --- design tokens (from handoff README) ---
-INK = "#2b2b2b"
-CRIT, WARN, OK = "#c0392b", "#c8920f", "#2e7d4f"
-CRIT_BG, WARN_BG, OK_BG = "#f8e3df", "#faf0d6", "#dff0e4"
-MUTED = "#8a8678"
+# --- design tokens ---
+INK = "#16191D"
+MUTED = "#5B6470"
+BORDER = "#E2E5E9"
+ACCENT = "#1F4BE0"
+CRIT, WARN, OK = "#C8362B", "#B5740A", "#1E7D54"
+CRIT_BG, WARN_BG, OK_BG = "#FCEDEB", "#FBF1DE", "#E7F4EC"
+MONO = "'IBM Plex Mono',monospace"
 
 STEP_NAMES = ["Upload", "Confirm", "Findings", "Inspect", "Export"]
 
@@ -41,53 +47,106 @@ USER_SUPPLIED = {
 
 
 def inject_css():
-    # ponytail: targets Streamlit's generated DOM — restyle, not pixel-perfect.
-    # Brittle to Streamlit version bumps; keep selectors broad.
-    st.markdown("""
+    # ponytail: targets Streamlit's generated DOM — brittle to version bumps.
+    st.markdown(f"""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Kalam:wght@300;400;700&display=swap');
-    .stApp { background:#efece4; }
-    .block-container { font-family:'Kalam',cursive; color:#2b2b2b; max-width:1180px; }
-    h1,h2,h3,.dc-display { font-family:'Caveat',cursive !important; font-weight:700; }
-    /* primary CTAs: organic asymmetric radius */
-    .stButton > button {
-        font-family:'Kalam',cursive; font-weight:700;
-        border-radius:10px 8px 12px 8px; border:2px solid #2b2b2b;
-    }
-    .stButton > button[kind="primary"] { background:#2b2b2b; color:#fff; }
-    .stButton > button[kind="primary"]:disabled { background:#bdbab0; border-color:#bdbab0; }
-    /* disclaimer banner — st.warning restyled to dashed amber */
-    [data-testid="stAlertContainer"] {
-        background:#faf0d6 !important; border:none !important;
-        border-bottom:2px dashed #c8920f !important; border-radius:8px;
-        color:#7a5a08 !important; font-size:12px;
-    }
-    /* cards / containers with borders */
-    [data-testid="stVerticalBlockBorderWrapper"] {
-        border-radius:12px !important;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+    .stApp {{ background:#F5F6F7; }}
+    .block-container {{
+        font-family:'Space Grotesk',sans-serif; color:{INK};
+        max-width:1140px; padding-top:2rem;
+    }}
+    h1,h2,h3 {{ font-family:'Space Grotesk',sans-serif !important;
+        letter-spacing:-.02em; font-weight:600; color:{INK}; }}
+    h3 {{ font-size:1.35rem; }}
+    .block-container p, .block-container li, .block-container label {{
+        font-family:'Space Grotesk',sans-serif; }}
+    code {{ font-family:{MONO}; background:#EEF0F2; color:{INK};
+        font-size:.85em; padding:1px 5px; border-radius:4px; }}
+
+    /* buttons */
+    .stButton>button {{
+        font-family:'Space Grotesk',sans-serif; font-weight:500; font-size:13px;
+        border-radius:8px; border:1px solid {BORDER}; background:#fff;
+        color:{INK}; transition:all .12s ease; box-shadow:none;
+    }}
+    .stButton>button:hover {{ border-color:{ACCENT}; color:{ACCENT}; background:#fff; }}
+    .stButton>button[kind="primary"] {{
+        background:{ACCENT}; border-color:{ACCENT}; color:#fff; }}
+    .stButton>button[kind="primary"]:hover {{
+        background:#1A40C4; border-color:#1A40C4; color:#fff; }}
+    .stButton>button:disabled, .stButton>button[kind="primary"]:disabled {{
+        background:#C7CCD3; border-color:#C7CCD3; color:#fff; }}
+    .stDownloadButton>button {{
+        font-family:'Space Grotesk',sans-serif; font-weight:500;
+        border-radius:8px; background:{ACCENT}; border:1px solid {ACCENT};
+        color:#fff; }}
+    .stDownloadButton>button:hover {{ background:#1A40C4; color:#fff; }}
+
+    /* disclaimer = restrained amber rail, not a shouty box */
+    [data-testid="stAlertContainer"], [data-testid="stAlert"] {{
+        background:#FBF6EA !important; border:1px solid #ECDFBE !important;
+        border-left:3px solid #C99A2E !important; border-radius:8px !important;
+        color:#7A5A12 !important; }}
+    [data-testid="stAlertContainer"] p {{ font-size:12px; line-height:1.45;
+        color:#7A5A12 !important; }}
+
+    /* inputs + dropzone */
+    [data-testid="stTextInput"] input, [data-baseweb="input"],
+    [data-testid="stNumberInput"] input {{ border-radius:8px !important; }}
+    [data-testid="stFileUploaderDropzone"] {{
+        background:#fff; border:1.5px dashed #C4CAD2; border-radius:10px; }}
+    [data-testid="stFileUploaderDropzone"]:hover {{ border-color:{ACCENT}; }}
+
+    /* radio row -> tidy chips spacing */
+    [role="radiogroup"] {{ gap:6px; }}
+    hr {{ border-color:{BORDER}; }}
     </style>
     """, unsafe_allow_html=True)
 
 
 def disclaimer():
-    st.warning(DISCLAIMER)
+    # strip the text's leading ⚠️ — st.warning already renders one
+    st.warning(DISCLAIMER.lstrip("⚠️ "))
+
+
+def eyebrow(text: str):
+    st.markdown(
+        f"<div style='font-family:{MONO};font-size:10.5px;letter-spacing:.12em;"
+        f"text-transform:uppercase;color:{MUTED};margin-bottom:1px'>{text}</div>",
+        unsafe_allow_html=True)
+
+
+def chip(text: str, color: str, bg: str) -> str:
+    return (f"<span style='font-family:{MONO};font-size:10px;font-weight:500;"
+            f"letter-spacing:.04em;text-transform:uppercase;color:{color};"
+            f"background:{bg};border-radius:5px;padding:3px 8px'>{text}</span>")
+
+
+def render_inline(html: str):
+    # Streamlit only passes HTML through when the block starts with a
+    # block-level tag — wrap bare inline spans so they don't render literally.
+    st.markdown(f"<div>{html}</div>", unsafe_allow_html=True)
 
 
 def conf_bar(c: float) -> str:
     color = OK if c >= 0.80 else WARN if c >= 0.60 else CRIT
-    bg = OK_BG if c >= 0.80 else WARN_BG if c >= 0.60 else CRIT_BG
     return (
-        f'<div style="display:flex;align-items:center;gap:6px;font-size:12px">'
-        f'<div style="flex:1;height:7px;background:{bg};border-radius:4px;overflow:hidden">'
-        f'<div style="width:{int(c*100)}%;height:100%;background:{color}"></div></div>'
-        f'{c:.2f}</div>'
-    )
+        f"<div style='display:flex;align-items:center;gap:8px;font-family:{MONO};"
+        f"font-size:11px;color:{MUTED}'>"
+        f"<div style='flex:1;height:5px;background:#EAECEF;border-radius:3px;"
+        f"overflow:hidden'><div style='width:{int(c*100)}%;height:100%;"
+        f"background:{color}'></div></div>{c:.2f}</div>")
 
 
 def bucket_color(bucket: str) -> str:
     return {"likely_violation": CRIT, "needs_verification": WARN,
             "appears_compliant": OK}[bucket]
+
+
+def _sev_bg(color: str) -> str:
+    return {CRIT: CRIT_BG, WARN: WARN_BG, OK: OK_BG}[color]
 
 
 def goto(step: int):
@@ -98,6 +157,7 @@ def goto(step: int):
 def password_gate() -> bool:
     if st.session_state.get("authed"):
         return True
+    eyebrow("Restricted · licensed reviewers only")
     pw = st.text_input("Access password", type="password")
     if pw and pw == st.secrets.get("APP_PASSWORD", ""):
         st.session_state.authed = True
@@ -122,45 +182,69 @@ def provider_config():
     return provider, api_key
 
 
+def header():
+    st.markdown(
+        f"<div style='display:flex;align-items:baseline;gap:13px;"
+        f"border-bottom:1px solid {BORDER};padding-bottom:13px;margin-bottom:4px'>"
+        f"<div style='font-family:\"Space Grotesk\";font-weight:600;font-size:21px;"
+        f"letter-spacing:-.02em'>RAJUK Permit-Sheet Verifier</div>"
+        f"<div style='font-family:{MONO};font-size:10.5px;color:{MUTED};"
+        f"text-transform:uppercase;letter-spacing:.12em'>MVP · decision-support"
+        f"</div></div>", unsafe_allow_html=True)
+
+
 def step_rail():
-    """Clickable left rail — free navigation per design (no gate)."""
+    """Measured flow rail — clickable, free navigation per design."""
     step = st.session_state.step
-    st.markdown("<div style='font-size:10.5px;color:#9a978b;text-transform:"
-                "uppercase;letter-spacing:.06em;margin-bottom:6px'>Submission "
-                "flow</div>", unsafe_allow_html=True)
+    eyebrow("Submission flow")
     for i, name in enumerate(STEP_NAMES):
-        mark = "✓" if i < step else "▶" if i == step else str(i + 1)
-        if st.button(f"{mark}  {name}", key=f"rail_{i}",
+        mark = "✓" if i < step else f"{i+1:02d}"
+        if st.button(f"{mark}   {name}", key=f"rail_{i}",
                      type="primary" if i == step else "secondary",
                      use_container_width=True):
             goto(i)
-    st.markdown("<div style='font-size:10px;color:#9a978b;line-height:1.3;"
-                "margin-top:10px'>Uploads &amp; crops deleted after the "
-                "session — no permanent archive.</div>", unsafe_allow_html=True)
+    st.markdown(
+        f"<div style='font-family:{MONO};font-size:9.5px;color:#9aa0a8;"
+        f"line-height:1.4;margin-top:12px'>Uploads &amp; crops deleted after the "
+        f"session. No permanent archive.</div>", unsafe_allow_html=True)
+
+
+def step_heading(idx: int, title: str, right_html: str = ""):
+    eyebrow(f"Step {idx+1:02d} / 05")
+    if right_html:
+        c1, c2 = st.columns([3, 2])
+        c1.subheader(title)
+        c2.markdown(f"<div style='text-align:right;padding-top:12px'>{right_html}"
+                    f"</div>", unsafe_allow_html=True)
+    else:
+        st.subheader(title)
 
 
 # ---------------------------------------------------------------- step 0
 def step_upload(provider, api_key):
-    st.subheader("1 · Upload")
+    step_heading(0, "Upload")
     packs = sorted(p.stem for p in PACK_DIR.glob("*.yaml"))
     uploaded = st.file_uploader(
-        "Drop permit-sheet PDF here  ·  raster ok (no text layer) · ≤ 2 pages",
+        "Drop a permit-sheet PDF — raster ok (no text layer) · ≤ 2 pages",
         type=["pdf"])
     c1, c2 = st.columns(2)
     c1.text_input("Jurisdiction / rule pack",
                   value="RAJUK DAP 2025 + BNBC-2020", disabled=True)
     c2.text_input("Effective date", value="2025-09-01", disabled=True)
-    st.caption("Active rule packs: " + ", ".join(f"`{p}`" for p in packs))
     st.markdown(
-        "<div style='font-family:Caveat,cursive;font-size:15px;color:#7a5a08;"
-        "background:#faf0d6;border-radius:8px;padding:8px 10px;margin-top:8px'>"
-        "Rule pack &amp; date are recorded on every report — reproducible "
-        "against a dated gazette.</div>", unsafe_allow_html=True)
+        f"<div style='font-family:{MONO};font-size:11px;color:{MUTED};"
+        f"margin-top:2px'>Active packs · " +
+        " · ".join(p for p in packs) + "</div>", unsafe_allow_html=True)
+    st.markdown(
+        f"<div style='font-size:12px;color:{MUTED};border-left:2px solid {BORDER};"
+        f"padding:2px 0 2px 11px;margin-top:12px'>Rule pack and effective date "
+        f"are stamped on every report — reproducible against a dated gazette."
+        f"</div>", unsafe_allow_html=True)
 
     if uploaded and st.button("Extract parameters →", type="primary",
                               disabled=not api_key):
         crop_dir = tempfile.mkdtemp(prefix="crops_")
-        with st.spinner(f"Rasterizing + reading sheet with {provider}…"):
+        with st.spinner(f"Rasterizing and reading the sheet with {provider}…"):
             try:
                 st.session_state.params = extract_params(
                     uploaded.read(), provider, api_key, crop_dir)
@@ -175,26 +259,34 @@ def step_confirm():
     """FR-5 gate: user edits/confirms before checks run. Non-negotiable."""
     params = st.session_state.get("params")
     if not params:
-        st.info("Upload and extract a sheet first (step 1).")
+        st.info("Upload and extract a sheet first.")
         return
 
-    flagged_unconfirmed = []  # filled while rendering
-    st.subheader("2 · Confirm extracted parameters")
-    st.caption("Checks won't run until every flagged field (🟡) is confirmed — "
-               "no manufactured confidence. Every edit is stored in the audit "
-               "trail.")
-    hdr = st.columns([2.2, 1, 2, 1.2])
-    for col, t in zip(hdr, ["Field", "Value", "Confidence", "Confirm"]):
-        col.markdown(f"**{t}**")
-
     edited = []
+    flagged_unconfirmed = []
+    # placeholder for the status pill (count known only after the loop)
+    pill = st.empty()
+    step_heading(1, "Confirm parameters")
+    st.markdown(
+        f"<div style='font-size:12.5px;color:{MUTED};margin:-4px 0 8px'>Checks "
+        f"won't run until every flagged field is confirmed — no manufactured "
+        f"confidence. Edits are kept in the audit trail.</div>",
+        unsafe_allow_html=True)
+
+    hdr = st.columns([2.4, 1, 2, 1.1])
+    for col, t in zip(hdr, ["FIELD", "VALUE", "CONFIDENCE", "CONFIRM"]):
+        col.markdown(f"<div style='font-family:{MONO};font-size:10px;"
+                     f"letter-spacing:.08em;color:{MUTED}'>{t}</div>",
+                     unsafe_allow_html=True)
+
     for p in params:
         flagged = p.confidence < CONFIDENCE_THRESHOLD
-        cols = st.columns([2.2, 1, 2, 1.2])
-        label = f"{'🟡 ' if flagged else ''}{p.param}"
-        cols[0].markdown(f"`{p.param}` {'🟡' if flagged else ''}<br>"
-                         f"<span style='font-size:10px;color:{MUTED}'>{p.unit}</span>",
-                         unsafe_allow_html=True)
+        cols = st.columns([2.4, 1, 2, 1.1])
+        cols[0].markdown(
+            f"<div style='font-family:{MONO};font-size:12.5px;padding-top:6px'>"
+            f"{'🔸 ' if flagged else ''}{p.param}"
+            f"<span style='color:{MUTED};font-size:10px'>  {p.unit}</span></div>",
+            unsafe_allow_html=True)
         if isinstance(p.value, bool):
             new_val = cols[1].checkbox(p.param, value=p.value, key=f"v_{p.param}",
                                        label_visibility="collapsed")
@@ -202,15 +294,16 @@ def step_confirm():
             new_val = cols[1].number_input(p.param, value=float(p.value),
                                            key=f"v_{p.param}",
                                            label_visibility="collapsed")
-        cols[2].markdown(conf_bar(p.confidence), unsafe_allow_html=True)
+        cols[2].markdown(f"<div style='padding-top:8px'>{conf_bar(p.confidence)}"
+                         f"</div>", unsafe_allow_html=True)
         confirm = cols[3].checkbox("confirm", value=not flagged,
                                    key=f"c_{p.param}",
                                    label_visibility="collapsed")
         if p.source_crop:
-            with cols[2].popover("📍 crop"):
+            with cols[2].popover("crop"):
                 st.image(p.source_crop)
         elif p.crop_fallback_note:
-            cols[2].caption(f"📍 p{p.source_page}: {p.crop_fallback_note}")
+            cols[2].caption(f"p{p.source_page}: {p.crop_fallback_note}")
         if flagged and not confirm:
             flagged_unconfirmed.append(p.param)
         edited.append(ExtractedParam(
@@ -220,8 +313,19 @@ def step_confirm():
             edited_from=p.value if new_val != p.value else None,
         ))
 
-    st.markdown("**Reviewer-supplied limits** (ward/LUC-specific — the sheet "
-                "can't tell us these; blank = rule reports *cannot evaluate*)")
+    if flagged_unconfirmed:
+        n = len(flagged_unconfirmed)
+        pill.markdown(f"<div>{chip(f'{n} field' + ('' if n == 1 else 's') + ' to confirm', WARN, WARN_BG)}</div>",
+                      unsafe_allow_html=True)
+    else:
+        pill.markdown(f"<div>{chip('all fields confirmed', OK, OK_BG)}</div>",
+                      unsafe_allow_html=True)
+
+    st.markdown(f"<div style='font-family:{MONO};font-size:10px;letter-spacing:"
+                f".08em;color:{MUTED};margin-top:14px'>REVIEWER-SUPPLIED LIMITS</div>"
+                f"<div style='font-size:11.5px;color:{MUTED};margin-bottom:4px'>"
+                f"Ward/LUC-specific — the sheet can't tell us these; blank = rule "
+                f"reports <i>cannot evaluate</i>.</div>", unsafe_allow_html=True)
     extracted_names = {p.param for p in edited}
     for name, lbl in USER_SUPPLIED.items():
         if name in extracted_names:
@@ -232,19 +336,8 @@ def step_confirm():
                 param=name, value=val, unit="", confidence=1.0,
                 source_page=0, confirmed=True))
 
-    if flagged_unconfirmed:
-        st.markdown(
-            f"<span style='font-size:11px;font-weight:700;color:#7a5a08;"
-            f"background:#faf0d6;border-radius:7px;padding:4px 9px'>"
-            f"{len(flagged_unconfirmed)} field"
-            f"{'' if len(flagged_unconfirmed)==1 else 's'} need confirmation"
-            f"</span>", unsafe_allow_html=True)
-    else:
-        st.markdown("<span style='font-size:11px;font-weight:700;color:#2e7d4f;"
-                    "background:#dff0e4;border-radius:7px;padding:4px 9px'>"
-                    "All fields confirmed ✓</span>", unsafe_allow_html=True)
-
-    if st.button("Run checks →", type="primary",
+    st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
+    if st.button("Run code checks →", type="primary",
                  disabled=bool(flagged_unconfirmed)):
         st.session_state.confirmed_params = edited
         st.session_state.findings = evaluate_rules(load_packs(), edited)
@@ -268,17 +361,15 @@ def _passes_filter(f, flt):
 def step_findings():
     findings = st.session_state.get("findings")
     if not findings:
-        st.info("Run checks first (step 2).")
+        st.info("Run checks first.")
         return
-    st.subheader("3 · Triaged findings")
     counts = {b: sum(1 for f in findings if f.bucket == b) for b in BUCKETS}
-    badges = "".join(
-        f"<span style='font-size:11px;font-weight:700;color:{bucket_color(b)};"
-        f"background:{ {CRIT:CRIT_BG,WARN:WARN_BG,OK:OK_BG}[bucket_color(b)] };"
-        f"border-radius:7px;padding:3px 8px;margin-right:6px'>"
-        f"{counts[b]} {BUCKET_LABELS[b].split(' ',1)[1]}</span>"
-        for b in BUCKETS)
-    st.markdown(badges, unsafe_allow_html=True)
+    labels = {"likely_violation": "likely", "needs_verification": "verify",
+              "appears_compliant": "ok"}
+    badges = "  ".join(
+        chip(f"{counts[b]} {labels[b]}", bucket_color(b),
+             _sev_bg(bucket_color(b))) for b in BUCKETS)
+    step_heading(2, "Findings", right_html=badges)
 
     flt = st.radio("filter", FILTERS, horizontal=True,
                    label_visibility="collapsed")
@@ -287,17 +378,22 @@ def step_findings():
         if not _passes_filter(f, flt):
             continue
         color = bucket_color(f.bucket)
-        verify = " · [VERIFY]" if f.verify_flag else ""
+        verify = "  ·  VERIFY" if f.verify_flag else ""
         st.markdown(
-            f"<div style='border:2px solid #2b2b2b;border-left:5px solid {color};"
-            f"border-radius:11px;padding:11px 14px;margin-top:8px'>"
-            f"<div style='display:flex;align-items:center;gap:9px'>"
-            f"<div style='width:11px;height:11px;border-radius:50%;background:{color}'></div>"
-            f"<div style='flex:1'><b style='font-size:13px'>{f.rule_id} — {f.severity}{verify}</b>"
-            f"<br><span style='font-size:10.5px;color:{MUTED}'>{f.regime} · {f.citation}</span></div>"
-            f"<span style='font-size:10px;color:{MUTED}'>{f.confidence:.2f}</span></div>"
+            f"<div style='background:#fff;border:1px solid {BORDER};"
+            f"border-left:3px solid {color};border-radius:10px;padding:12px 15px;"
+            f"margin-top:8px;display:flex;align-items:center;gap:13px'>"
+            f"<div style='flex:1'>"
+            f"<div style='font-size:13px;font-weight:500;color:{INK};"
+            f"line-height:1.35'>{f.reason}</div>"
+            f"<div style='font-family:{MONO};font-size:10.5px;color:{MUTED};"
+            f"margin-top:3px'>{f.rule_id} · {f.regime} · {f.citation}{verify}</div>"
+            f"</div>"
+            f"{chip(f.severity, color, _sev_bg(color))}"
+            f"<span style='font-family:{MONO};font-size:11px;color:{MUTED};"
+            f"min-width:30px;text-align:right'>{f.confidence:.2f}</span>"
             f"</div>", unsafe_allow_html=True)
-        if st.button("Inspect ›", key=f"insp_{i}"):
+        if st.button("Inspect →", key=f"insp_{i}"):
             st.session_state.active_finding = i
             goto(3)
 
@@ -306,112 +402,128 @@ def step_findings():
 def step_inspect():
     findings = st.session_state.get("findings")
     if not findings:
-        st.info("Run checks first (step 2).")
+        st.info("Run checks first.")
         return
-    idx = st.session_state.get("active_finding", 0)
-    idx = max(0, min(idx, len(findings) - 1))
+    idx = max(0, min(st.session_state.get("active_finding", 0),
+                     len(findings) - 1))
     f = findings[idx]
     color = bucket_color(f.bucket)
 
     top = st.columns([3, 1])
-    if top[0].button("‹ back to findings"):
+    if top[0].button("‹ Back to findings"):
         goto(2)
-    top[1].markdown(f"<div style='text-align:right;font-size:11px;font-weight:700'>"
-                    f"Finding {idx+1} of {len(findings)}</div>",
+    top[1].markdown(f"<div style='text-align:right;font-family:{MONO};"
+                    f"font-size:11px;color:{MUTED};padding-top:7px'>"
+                    f"{idx+1:02d} / {len(findings):02d}</div>",
                     unsafe_allow_html=True)
 
     left, right = st.columns([2, 1])
     with left:
+        render_inline(
+            chip(f.severity, color, _sev_bg(color)) + "  " +
+            chip(f.regime, INK, "#EEF0F2") +
+            f"  <span style='font-family:{MONO};font-size:10.5px;color:{MUTED}'>"
+            f"confidence {f.confidence:.2f}</span>")
         st.markdown(
-            f"<span style='font-size:10.5px;font-weight:700;color:{color};"
-            f"background:{ {CRIT:CRIT_BG,WARN:WARN_BG,OK:OK_BG}[color] };"
-            f"border-radius:6px;padding:3px 8px'>{f.severity}</span> "
-            f"<span style='font-size:10.5px;font-weight:700;background:#ece9df;"
-            f"border-radius:6px;padding:3px 8px'>{f.regime}</span> "
-            f"<span style='font-size:10.5px;color:{MUTED}'>confidence "
-            f"{f.confidence:.2f}</span>", unsafe_allow_html=True)
-        st.markdown(f"<div class='dc-display' style='font-size:24px;font-weight:700;"
-                    f"margin:8px 0'>{f.rule_id}</div>", unsafe_allow_html=True)
-        st.write(f.reason)
-        st.markdown(
-            f"<div style='font-size:11.5px;background:#f4f2eb;border-left:3px "
-            f"solid #2b2b2b;padding:8px 11px'><b>Clause</b><br>{f.citation}</div>",
+            f"<div style='font-size:19px;font-weight:600;letter-spacing:-.01em;"
+            f"margin:10px 0 4px;line-height:1.25'>{f.reason}</div>",
             unsafe_allow_html=True)
         st.markdown(
-            f"<div style='font-size:11.5px;background:#eef6f0;border-left:3px "
-            f"solid #2e7d4f;padding:8px 11px;margin-top:8px'><b>Suggested fix</b>"
-            f"<br>{f.remediation}</div>", unsafe_allow_html=True)
-        st.caption(f"Inputs used: `{f.inputs_used}`")
+            f"<div style='font-size:11px;color:{MUTED};font-family:{MONO}'>"
+            f"Inputs · {f.inputs_used}</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div style='font-size:12px;background:#F7F8F9;border-left:3px solid "
+            f"{INK};border-radius:0 6px 6px 0;padding:9px 12px;margin-top:12px'>"
+            f"<span style='font-family:{MONO};font-size:9.5px;letter-spacing:"
+            f".1em;color:{MUTED}'>CLAUSE</span><br>{f.citation}</div>",
+            unsafe_allow_html=True)
+        st.markdown(
+            f"<div style='font-size:12px;background:{OK_BG};border-left:3px solid "
+            f"{OK};border-radius:0 6px 6px 0;padding:9px 12px;margin-top:8px'>"
+            f"<span style='font-family:{MONO};font-size:9.5px;letter-spacing:"
+            f".1em;color:{OK}'>SUGGESTED FIX</span><br>{f.remediation}</div>",
+            unsafe_allow_html=True)
     with right:
-        st.markdown(f"<div style='font-size:11px;color:#6b6859'>Sheet location · "
-                    f"page</div>", unsafe_allow_html=True)
+        eyebrow("Sheet evidence")
         if f.sheet_location:
-            st.image(f.sheet_location, caption="evidence crop")
+            st.image(f.sheet_location, caption="extracted crop")
         else:
-            st.markdown("<div style='background:repeating-linear-gradient(45deg,"
-                        "#eeece4,#eeece4 8px,#e1ded2 8px,#e1ded2 16px);border:2px "
-                        "solid #2b2b2b;border-radius:6px;height:140px;display:flex;"
-                        "align-items:center;justify-content:center'><span "
-                        "style='font-family:monospace;font-size:10px;background:#fff;"
-                        "padding:3px 6px;border-radius:3px'>no crop</span></div>",
-                        unsafe_allow_html=True)
+            st.markdown(
+                f"<div style='background:#fff;border:1px dashed #C4CAD2;"
+                f"border-radius:8px;height:150px;display:flex;align-items:center;"
+                f"justify-content:center;font-family:{MONO};font-size:10.5px;"
+                f"color:{MUTED}'>no crop available</div>", unsafe_allow_html=True)
 
+    st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
     act = st.columns([1, 1, 3])
-    if act[0].button("Accept finding", type="primary"):
+    if act[0].button("Accept", type="primary"):
         f.user_action = "accept"
     if act[1].button("Dismiss"):
         f.user_action = "dismiss"
-    f.user_note = act[2].text_input("add a note for the report…",
+    f.user_note = act[2].text_input("Add a note for the report",
                                     value=f.user_note or "",
-                                    label_visibility="collapsed") or None
+                                    label_visibility="collapsed",
+                                    placeholder="Add a note for the report…") \
+        or None
     if f.user_action:
-        st.caption(f"Reviewer action: **{f.user_action}**")
+        render_inline(chip(f"reviewer · {f.user_action}", INK, "#EEF0F2"))
 
 
 # ---------------------------------------------------------------- step 4
 def step_export():
     findings = st.session_state.get("findings")
     if not findings:
-        st.info("Run checks first (step 2).")
+        st.info("Run checks first.")
         return
-    st.subheader("5 · Build & export report")
+    step_heading(4, "Export report")
     left, right = st.columns([1, 1])
     with left:
-        st.markdown("**Format**")
-        fmt = st.radio("format", ["PDF (print HTML)", "Markdown"],
+        eyebrow("Format")
+        fmt = st.radio("format", ["HTML (print → PDF)", "Markdown"],
                        label_visibility="collapsed")
-        st.markdown("**Include**")
+        eyebrow("Include")
         st.checkbox("Risk summary (counts by severity)", value=True, disabled=True)
-        st.checkbox("Full findings list + accept/dismiss notes", value=True,
+        st.checkbox("Full findings + accept/dismiss notes", value=True,
                     disabled=True)
-        st.checkbox("Parameters used", value=True, disabled=True)
-        include_crops = st.checkbox("Evidence crops (confidential)", value=False)
-        st.checkbox("Disclaimer + rule-pack version (🔒 locked on)", value=True,
+        st.checkbox("Parameters used (audit trail)", value=True, disabled=True)
+        include_crops = st.checkbox("Evidence crops — confidential", value=False)
+        st.checkbox("Disclaimer + rule-pack version — locked on", value=True,
                     disabled=True)
     with right:
         packs = sorted(p.stem for p in PACK_DIR.glob("*.yaml"))
         report = new_report(packs, st.session_state.confirmed_params, findings)
-        # ponytail: crop toggle only strips crops from HTML export (the only
-        # render that embeds them); MD has none. Strip in-place on a shallow copy.
+        # ponytail: crop toggle strips crops from the HTML render (only one that
+        # embeds them); MD has none.
         if not include_crops:
             for f in report.findings:
                 f.sheet_location = None
-        st.markdown("**Preview**")
+        counts = {b: sum(1 for f in findings if f.bucket == b) for b in BUCKETS}
+        labels = {"likely_violation": "likely", "needs_verification": "verify",
+                  "appears_compliant": "ok"}
+        eyebrow("Preview")
         st.markdown(
-            f"<div style='background:#e7e4db;border-radius:6px;padding:12px'>"
-            f"<div style='background:#fff;border:1px solid #c4c0b3;padding:10px'>"
-            f"<div class='dc-display' style='font-size:15px;font-weight:700'>"
-            f"Permit-sheet triage report</div>"
-            f"<div style='font-size:8.5px;color:#6b6859'>"
-            f"{' · '.join(packs)}</div></div></div>", unsafe_allow_html=True)
+            f"<div style='background:#fff;border:1px solid {BORDER};"
+            f"border-radius:10px;padding:16px'>"
+            f"<div style='font-weight:600;font-size:14px'>Permit-sheet triage "
+            f"report</div>"
+            f"<div style='font-size:10px;background:#FBF6EA;border-left:3px solid "
+            f"#C99A2E;color:#7A5A12;padding:5px 8px;border-radius:0 4px 4px 0;"
+            f"margin:8px 0'>Decision-support only — not a certification.</div>"
+            f"<div style='font-family:{MONO};font-size:9px;color:{MUTED}'>"
+            f"{' · '.join(packs)}</div>"
+            f"<div style='margin-top:8px'>" +
+            "  ".join(chip(f"{counts[b]} {labels[b]}", bucket_color(b),
+                           _sev_bg(bucket_color(b))) for b in BUCKETS) +
+            f"</div></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
         if fmt.startswith("Markdown"):
             st.download_button("Export report →", render_markdown(report),
-                               type="primary",
-                               file_name=f"findings_{report.submission_id[:8]}.md")
+                               file_name=f"findings_{report.submission_id[:8]}.md",
+                               use_container_width=True)
         else:
             st.download_button("Export report →", render_html(report),
-                               type="primary",
-                               file_name=f"findings_{report.submission_id[:8]}.html")
+                               file_name=f"findings_{report.submission_id[:8]}.html",
+                               use_container_width=True)
 
 
 # ---------------------------------------------------------------- footer
@@ -423,13 +535,13 @@ def footer_nav():
     c1, c2, c3 = st.columns([1, 2, 1])
     if step > 0 and c1.button("‹ Back"):
         goto(step - 1)
-    c2.markdown(f"<div style='text-align:center;font-size:11.5px;color:#6b6859'>"
-                f"Step {step+1} of 5 · {STEP_NAMES[step]}</div>",
-                unsafe_allow_html=True)
+    c2.markdown(
+        f"<div style='text-align:center;font-family:{MONO};font-size:10.5px;"
+        f"letter-spacing:.06em;color:{MUTED}'>STEP {step+1:02d} / 05 · "
+        f"{STEP_NAMES[step].upper()}</div>", unsafe_allow_html=True)
     # Confirm + Export carry their action button in-panel; no footer Next.
     if step in (0, 2, 3):
         nxt_label = "Export →" if step == 3 else "Next →"
-        # gate Upload->Confirm on extraction; Findings/Inspect need findings.
         disabled = (step == 0 and not has_params) or \
                    (step in (2, 3) and not has_findings)
         if c3.button(nxt_label, type="primary", disabled=disabled,
@@ -439,15 +551,14 @@ def footer_nav():
 
 def main():
     inject_css()
-    st.markdown("<h1>📐 RAJUK Permit-Sheet Verifier — MVP</h1>",
-                unsafe_allow_html=True)
+    header()
     disclaimer()
     if not password_gate():
         return
     provider, api_key = provider_config()
     st.session_state.setdefault("step", 0)
 
-    rail_col, content = st.columns([1, 4])
+    rail_col, content = st.columns([1, 3.4], gap="large")
     with rail_col:
         step_rail()
     with content:
@@ -463,7 +574,6 @@ def main():
         elif step == 4:
             step_export()
         footer_nav()
-    disclaimer()
 
 
 main()
