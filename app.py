@@ -53,9 +53,11 @@ def inject_css():
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
     .stApp {{ background:#F5F6F7; }}
+    /* hide Streamlit's floating top toolbar so it can't clip our header */
+    [data-testid="stHeader"] {{ display:none; }}
     .block-container {{
         font-family:'Space Grotesk',sans-serif; color:{INK};
-        max-width:1140px; padding-top:2rem;
+        max-width:1140px; padding-top:3rem;
     }}
     h1,h2,h3 {{ font-family:'Space Grotesk',sans-serif !important;
         letter-spacing:-.02em; font-weight:600; color:{INK}; }}
