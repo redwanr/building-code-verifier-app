@@ -1003,7 +1003,7 @@ def footer_nav():
         f"letter-spacing:.06em;color:{INK3};padding-top:12px'>"
         f"STEP {step+1:02d} / 05 · {STEP_NAMES[step].upper()}</div>",
         unsafe_allow_html=True)
-    # Confirm + Export carry their own action button; no footer Next there
+    # Confirm carries its own action; Export gets a "New submission" restart
     if step in (0, 2, 3):
         nxt_label = "Export →" if step == 3 else "Next →"
         disabled = (step == 0 and not has_params) or \
@@ -1011,6 +1011,12 @@ def footer_nav():
         if c3.button(nxt_label, type="secondary", key=f"next_{step}",
                      disabled=disabled):
             goto(step + 1)
+    elif step == 4:
+        if c3.button("New submission →", type="primary", key="new_submission"):
+            for k in ("params", "findings", "confirmed_params", "active_finding",
+                      "demo_mode"):
+                st.session_state.pop(k, None)
+            goto(0)
 
 
 # ---------------------------------------------------------------- main
