@@ -35,6 +35,42 @@ PARAM_NAMES = [
     "has_fire_rated_stair_enclosure", "has_firefighting_lift",
 ]
 
+# (param, value, unit, confidence) — representative G+9 sheet for offline UI
+# testing. Mix of confidences so the confirmation gate and all three finding
+# buckets get exercised. No API call, no credits.
+_MOCK_ROWS = [
+    ("building_height_m", 35.0, "m", 0.80),
+    ("num_storeys", 10, "", 0.95),
+    ("plot_area_m2", 200.0, "m²", 0.90),
+    ("total_floor_area_m2", 840.0, "m²", 0.88),
+    ("claimed_far", 4.2, "", 0.62),             # flagged
+    ("claimed_mgc_pct", 58.0, "%", 0.88),
+    ("num_exit_stairs", 1, "", 0.55),           # flagged
+    ("exit_stair_width_m", 1.2, "m", 0.72),
+    ("num_lifts", 2, "", 0.90),
+    ("parking_provided", 8, "", 0.90),
+    ("parking_provided_table", 8, "", 0.86),
+    ("parking_count_on_plan", 6, "", 0.84),     # mismatch → red finding
+    ("num_units", 36, "", 0.84),
+    ("front_setback_m", 1.5, "m", 0.78),
+    ("rear_setback_m", 1.0, "m", 0.66),         # flagged
+    ("side_setback_m", 1.25, "m", 0.74),
+    ("has_fire_alarm", True, "", 0.58),         # flagged
+    ("has_fire_hydrant_standpipe", False, "", 0.80),
+    ("has_fire_rated_stair_enclosure", True, "", 0.83),
+    ("has_firefighting_lift", False, "", 0.77),
+]
+
+
+def mock_params() -> list[ExtractedParam]:
+    """Canned extraction for local UI testing — bypasses the vision-LLM call."""
+    return [
+        ExtractedParam(param=p, value=v, unit=u, confidence=c, source_page=1,
+                       crop_fallback_note="mock fixture — no crop")
+        for p, v, u, c in _MOCK_ROWS
+    ]
+
+
 EXTRACTION_PROMPT = f"""You are reading one page of a RAJUK building-approval permit sheet \
 (Dhaka, Bangladesh): a dense raster drawing with floor plans, elevations, sections, \
 and data tables (area/FAR/MGC/setback/parking). Labels are mostly English; some \
