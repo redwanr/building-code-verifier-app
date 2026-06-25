@@ -39,19 +39,46 @@ URL is shared.
 - `rules.py` — YAML pack loader + simpleeval interpreter. Rules cap at "needs_verification" when `verify_flag: true`; missing/unconfirmed input → "cannot evaluate" (FR-9).
 - `rule_packs/*.yaml` — the rules. Edit values here, never in code. `logic` must be a single-line simpleeval expression (multi-line YAML folds break ast.parse).
 - `extraction.py` — pdf2image → provider-switched vision call (Claude `claude-opus-4-8` default, Gemini via `GEMINI_MODEL`). Confidence < 0.7 → unconfirmed.
-- `app.py` — Streamlit flow: password gate → upload → confirmation gate → findings → export.
+- `app.py` — Streamlit 5-step wizard (Upload → Confirm → Findings → Inspect → Export)
+  behind a password gate. Warm-professional UI: IBM Plex Sans/Serif/Mono, clay accent
+  (`#B65C30`), canvas bg (`#F6F1E7`). Key chrome blocks injected as `st.markdown` HTML:
+  header (clay app mark), disclaimer strip, horizontal stepper, finding cards with full
+  anatomy (sev chip, conf meter, INPUTS box, SUGGESTED FIX block). Demo-mode toggle on
+  Upload (bypasses API, loads `mock_params()`). URL-token auth persists across reloads.
+  No watchdog in venv → restart server after editing non-app.py modules.
 
-## Project status & next steps (as of 2026-06-17)
+### Local-dev conveniences
+- **Demo mode** — toggle on Upload loads `extraction.mock_params()` (canned G+9 sheet,
+  4 fields flagged <0.7). No API call. Use for UI testing; never spend credits to click.
+- **Auth token** — local `demo` password → token `b94a5862a11c9a4dec7f3352` in `?k=`.
+- **Playwright MCP** — installed at user scope; `browser_*` tools available at session
+  start. Drive `http://localhost:8501?k=b94a5862a11c9a4dec7f3352` directly. Mid-session
+  fallback: `.venv/bin/python` + playwright scripts (chromium pre-installed).
 
-**MVP implemented and DEPLOYED LIVE to Streamlit Community Cloud for partner testing (2026-06-17).** Tests green, repo at https://github.com/redwanr/building-code-verifier-app (private). Full decision log in `~/.claude/plans/cozy-churning-orbit.md` (grill-me interview: Streamlit monolith, vision-LLM-only extraction, Claude Opus 4.8 default + Gemini option, simpleeval YAML rules, provisional [VERIFY] thresholds capped at needs-verification, user-supplied permissible FAR/MGC at gate, session-only persistence, MD/HTML export, shared-password gate). Sidebar provider defaults to **gemini** (cloud secrets only carry a Gemini key). Gemini `gemini-3.5-flash` VERIFIED working e2e against the real firm sheet `tests/Uttara15C1 _ architectural.pdf` (gitignored). Done since 06-12: ✅ secrets, ✅ Gemini model verified, ✅ deploy. Partner explainer: `docs/How-The-MVP-Works.docx`.
+## Project status & next steps (as of 2026-06-25)
+
+**Redesign v2 shipped as PR #9** (`design-handoff-v2` branch, not yet merged to main).
+Full visual overhaul from `docs/Rajuk Verifier SaaS.zip` design handoff: IBM Plex
+family, clay accent, horizontal stepper, rich finding cards, slim disclaimer strip,
+`render_html` ported from production-grade export template. Tests green (31).
+
+**Deployed main** is at commit `1baa2f9` (header-fix UI from PRs #6–#8). Once PR #9
+merges, Streamlit auto-redeploys (~1–2 min). The `ui-iteration` branch (5 local commits,
+never pushed to remote) is superseded by `design-handoff-v2` and can be abandoned.
 
 Next steps, in order:
-1. **Fixtures + accuracy** — add validation sheets as `fixtures/<name>.pdf` + `<name>.truth.yaml`; run `eval_providers.py` to measure field accuracy (target ≥0.80 Tier-1, PRD §12). No truth file exists for the Uttara sheet yet.
-2. **Provider A/B** — `.venv/bin/python eval_providers.py both`; revisit production default (currently gemini by necessity, not measured accuracy).
-3. **Live extraction tuning** — iterate `EXTRACTION_PROMPT` in `extraction.py`; note observed run-to-run non-determinism on the same sheet (recall-critical — consider multi-pass reconcile).
-4. **Rule thresholds** — 9 of 11 rules carry `verify_flag` (provisional [VERIFY]); domain expert must confirm 2025/2026 values to unlock hard red/green beyond the 2 consistency rules.
+1. **Merge PR #9** → founder review → squash/merge → auto-deploy.
+2. **Fixtures + accuracy** — add validation sheets as `fixtures/<name>.pdf` +
+   `<name>.truth.yaml`; run `eval_providers.py` (target ≥0.80 Tier-1, PRD §12).
+3. **Provider A/B** — `.venv/bin/python eval_providers.py both`; revisit production
+   default (currently gemini by necessity, not measured accuracy).
+4. **Live extraction tuning** — iterate `EXTRACTION_PROMPT` in `extraction.py`;
+   non-determinism observed on same sheet (consider multi-pass reconcile).
+5. **Rule thresholds** — 9 of 11 rules carry `verify_flag`; domain expert must confirm
+   2025/2026 values to unlock hard red/green beyond the 2 consistency rules.
 
-Open items from `docs/open-questions.md` still unanswered: rule-pack value owner (Q4), go-bar confirmation (Q5). Product: a RAJUK Permit-Sheet Code Verifier MVP — upload a Dhaka building-approval drawing (flattened raster PDF), extract planning/life-safety parameters via vision-LLM (no OCR engine — vision-only), run data-driven code checks, present triaged findings for a qualified architect/engineer to review.
+Open items from `docs/open-questions.md` still unanswered: rule-pack value owner (Q4),
+go-bar confirmation (Q5). Partner explainer: `docs/How-The-MVP-Works.docx`.
 
 Read these before any work:
 - `docs/PRD.md` — full product spec (FRs, schemas, pipeline, eval plan)
