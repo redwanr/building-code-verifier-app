@@ -2,7 +2,7 @@ import { create } from 'zustand'
 
 import { evaluateRules, type ExtractedParam, type Finding, type Rule } from './engine/rules'
 
-export const CONFIDENCE_THRESHOLD = 0.7
+export { CONFIDENCE_THRESHOLD } from './extraction/extract'
 
 export interface ReviewerAction {
   action?: 'accept' | 'dismiss'
@@ -19,7 +19,8 @@ interface AppState {
   stage: 'upload' | 'workspace'
   rules: Rule[]
   packNames: string[]
-  sheet: SheetPage | null
+  pages: SheetPage[]
+  pageIdx: number
   sheetName: string
   params: ExtractedParam[]
   /** reviewer-typed values for rule inputs the sheet can't provide (ward/LUC limits etc.) */
@@ -30,7 +31,8 @@ interface AppState {
   tab: 'values' | 'checks'
 
   setPacks: (rules: Rule[], packNames: string[]) => void
-  openReview: (sheetName: string, sheet: SheetPage | null, params: ExtractedParam[]) => void
+  openReview: (sheetName: string, pages: SheetPage[], params: ExtractedParam[]) => void
+  setPageIdx: (idx: number) => void
   setParamValue: (name: string, value: unknown) => void
   setConfirmed: (name: string, confirmed: boolean) => void
   setSupplied: (name: string, value: number | null) => void
@@ -44,7 +46,8 @@ export const useStore = create<AppState>((set) => ({
   stage: 'upload',
   rules: [],
   packNames: [],
-  sheet: null,
+  pages: [],
+  pageIdx: 0,
   sheetName: '',
   params: [],
   supplied: {},
@@ -53,8 +56,9 @@ export const useStore = create<AppState>((set) => ({
   tab: 'values',
 
   setPacks: (rules, packNames) => set({ rules, packNames }),
-  openReview: (sheetName, sheet, params) =>
-    set({ stage: 'workspace', sheetName, sheet, params, supplied: {}, reviewerActions: {}, focusParam: null, tab: 'values' }),
+  openReview: (sheetName, pages, params) =>
+    set({ stage: 'workspace', sheetName, pages, pageIdx: 0, params, supplied: {}, reviewerActions: {}, focusParam: null, tab: 'values' }),
+  setPageIdx: (idx) => set({ pageIdx: idx, focusParam: null }),
   setParamValue: (name, value) =>
     set((s) => ({
       params: s.params.map((p) =>
@@ -81,7 +85,7 @@ export const useStore = create<AppState>((set) => ({
   setFocusParam: (name) => set({ focusParam: name }),
   setTab: (tab) => set({ tab }),
   reset: () =>
-    set({ stage: 'upload', sheet: null, sheetName: '', params: [], supplied: {}, reviewerActions: {}, focusParam: null, tab: 'values' }),
+    set({ stage: 'upload', pages: [], pageIdx: 0, sheetName: '', params: [], supplied: {}, reviewerActions: {}, focusParam: null, tab: 'values' }),
 }))
 
 /** All params fed to the engine: extracted + reviewer-supplied limits (confidence 1, confirmed). */

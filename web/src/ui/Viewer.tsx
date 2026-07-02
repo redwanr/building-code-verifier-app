@@ -14,10 +14,15 @@ interface View {
 }
 
 export function Viewer() {
-  const sheet = useStore((s) => s.sheet)
-  const params = useStore((s) => s.params)
+  const pages = useStore((s) => s.pages)
+  const pageIdx = useStore((s) => s.pageIdx)
+  const setPageIdx = useStore((s) => s.setPageIdx)
+  const allParams = useStore((s) => s.params)
   const focusParam = useStore((s) => s.focusParam)
   const setFocusParam = useStore((s) => s.setFocusParam)
+
+  const sheet = pages[pageIdx] ?? null
+  const params = allParams.filter((p) => p.sourcePage === pageIdx + 1)
 
   const host = useRef<HTMLDivElement>(null)
   const [view, setView] = useState<View>({ scale: 0.4, tx: 0, ty: 0 })
@@ -130,6 +135,20 @@ export function Viewer() {
         <span className="pct">{Math.round(view.scale * 100)}%</span>
         <button aria-label="Zoom in" onClick={(e) => { e.stopPropagation(); zoomAt(host.current!.clientWidth / 2, host.current!.clientHeight / 2, 1.25) }}>+</button>
         <button onClick={(e) => { e.stopPropagation(); fit() }}>fit</button>
+        {pages.length > 1 && (
+          <>
+            <span style={{ width: 1, height: 16, background: 'var(--line)' }} />
+            {pages.map((_, i) => (
+              <button
+                key={i}
+                style={i === pageIdx ? { background: 'var(--g700)' } : undefined}
+                onClick={(e) => { e.stopPropagation(); setPageIdx(i) }}
+              >
+                p{i + 1}
+              </button>
+            ))}
+          </>
+        )}
       </div>
     </div>
   )
