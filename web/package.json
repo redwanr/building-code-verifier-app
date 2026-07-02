@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "sync-packs": "rm -rf public/rule_packs && mkdir -p public/rule_packs && cp ../rule_packs/*.yaml public/rule_packs/",
+    "sync-packs": "rm -rf public/rule_packs && mkdir -p public/rule_packs && cp ../rule_packs/*.yaml public/rule_packs/ && node -e \"const fs=require('fs');fs.writeFileSync('public/rule_packs/index.json',JSON.stringify(fs.readdirSync('public/rule_packs').filter(f=>f.endsWith('.yaml'))))\"",
     "predev": "npm run sync-packs",
     "prebuild": "npm run sync-packs",
     "pretest": "npm run sync-packs",
