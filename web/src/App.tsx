@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { fetchPacks } from './engine/packs'
 import { useStore } from './store'
+import { Export } from './ui/Export'
 import { Panel } from './ui/Panel'
 import { Upload } from './ui/Upload'
 import { Viewer } from './ui/Viewer'
@@ -43,9 +44,7 @@ export default function App() {
           <>
             <span className="sheet-name">{sheetName}</span>
             <button className="btn quiet" onClick={reset}>New review</button>
-            <button className="btn primary" disabled title="Export lands in the next build">
-              Export report
-            </button>
+            <Export />
           </>
         )}
       </header>

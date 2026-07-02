@@ -1,10 +1,15 @@
 import { useRef, useState } from 'react'
 
 import { DEMO_SHEET, demoParams } from '../demo/demoSheet'
-import { AuthError, extract, WORKER_URL } from '../extraction/extract'
-import { useStore } from '../store'
+import { AuthError, extract, rasterizePdf, WORKER_URL } from '../extraction/extract'
+import { loadDraft, useStore } from '../store'
 
 const PW_KEY = 'rajuk-verifier-pw'
+
+async function fileKeyOf(file: File): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', await file.arrayBuffer())
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('')
+}
 
 export function Upload() {
   const openReview = useStore((s) => s.openReview)
@@ -16,13 +21,16 @@ export function Upload() {
   const fileInput = useRef<HTMLInputElement>(null)
 
   const canExtract = Boolean(WORKER_URL)
+  const draft = loadDraft()
 
-  const openDemo = () =>
+  const openDemo = () => {
+    const restore = draft?.fileKey === 'demo' ? draft : undefined
     openReview('synthetic-demo-g9.svg', [{
       dataUrl: DEMO_SHEET.dataUrl,
       width: DEMO_SHEET.width,
       height: DEMO_SHEET.height,
-    }], demoParams())
+    }], restore?.params ?? demoParams(), 'demo', restore)
+  }
 
   const run = async (file: File) => {
     setError(null)
@@ -30,13 +38,28 @@ export function Upload() {
       setError('That is not a PDF. Drop the permit sheet as a raster PDF.')
       return
     }
-    if (!password) {
-      setError('Enter the reviewer password first — extraction is gated.')
-      return
-    }
-    localStorage.setItem(PW_KEY, password)
     setBusy('Starting…')
     try {
+      const fileKey = await fileKeyOf(file)
+
+      // same file as the saved draft → re-render locally, restore the review,
+      // skip the extraction call entirely
+      if (draft && draft.fileKey === fileKey) {
+        setBusy('Resuming your review — re-rendering the sheet locally…')
+        const pages = await rasterizePdf(file)
+        openReview(
+          file.name,
+          pages.map((p) => ({ dataUrl: p.dataUrl, width: p.width, height: p.height })),
+          draft.params, fileKey, draft,
+        )
+        return
+      }
+
+      if (!password) {
+        setError('Enter the reviewer password first — extraction is gated.')
+        return
+      }
+      localStorage.setItem(PW_KEY, password)
       const { pages, params } = await extract(file, provider, password, setBusy)
       if (params.length === 0) {
         setError('The extractor found no readable parameters on this sheet. Try the other provider, or check the PDF renders legibly.')
@@ -45,7 +68,7 @@ export function Upload() {
       openReview(
         file.name,
         pages.map((p) => ({ dataUrl: p.dataUrl, width: p.width, height: p.height })),
-        params,
+        params, fileKey,
       )
     } catch (e) {
       if (e instanceof AuthError) {
@@ -129,6 +152,16 @@ export function Upload() {
       )}
 
       {error && <div className="upload-error">{error}</div>}
+
+      {draft && (
+        <div className="resume-line">
+          Unfinished review of <b>{draft.sheetName}</b> saved{' '}
+          {new Date(draft.savedAt).toLocaleString()}.{' '}
+          {draft.fileKey === 'demo'
+            ? 'Open the demo review below to pick it up.'
+            : 'Re-drop the same PDF to resume it — no re-extraction, no credits.'}
+        </div>
+      )}
 
       <div className="demo-line">
         No sheet at hand? <button onClick={openDemo}>Open the demo review</button> — a synthetic

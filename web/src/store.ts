@@ -15,12 +15,54 @@ export interface SheetPage {
   height: number
 }
 
+/** Resumable review state — values only, never page images or crops (confidential). */
+export interface Draft {
+  fileKey: string
+  sheetName: string
+  params: ExtractedParam[]
+  supplied: Record<string, number>
+  reviewerActions: Record<string, ReviewerAction>
+  savedAt: string
+}
+
+const DRAFT_KEY = 'rajuk-verifier-draft'
+
+export function loadDraft(): Draft | null {
+  try {
+    return JSON.parse(localStorage.getItem(DRAFT_KEY) ?? 'null')
+  } catch {
+    return null
+  }
+}
+
+export function clearDraft(): void {
+  localStorage.removeItem(DRAFT_KEY)
+}
+
+function saveDraft(s: AppState): void {
+  if (s.stage !== 'workspace' || !s.fileKey) return
+  const draft: Draft = {
+    fileKey: s.fileKey,
+    sheetName: s.sheetName,
+    params: s.params.map((p) => ({ ...p, sourceCrop: null })),
+    supplied: s.supplied,
+    reviewerActions: s.reviewerActions,
+    savedAt: new Date().toISOString(),
+  }
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
+  } catch {
+    /* quota — drafts are a convenience, never block the review */
+  }
+}
+
 interface AppState {
   stage: 'upload' | 'workspace'
   rules: Rule[]
   packNames: string[]
   pages: SheetPage[]
   pageIdx: number
+  fileKey: string
   sheetName: string
   params: ExtractedParam[]
   /** reviewer-typed values for rule inputs the sheet can't provide (ward/LUC limits etc.) */
@@ -31,7 +73,13 @@ interface AppState {
   tab: 'values' | 'checks'
 
   setPacks: (rules: Rule[], packNames: string[]) => void
-  openReview: (sheetName: string, pages: SheetPage[], params: ExtractedParam[]) => void
+  openReview: (
+    sheetName: string,
+    pages: SheetPage[],
+    params: ExtractedParam[],
+    fileKey?: string,
+    restore?: Pick<Draft, 'supplied' | 'reviewerActions'>,
+  ) => void
   setPageIdx: (idx: number) => void
   setParamValue: (name: string, value: unknown) => void
   setConfirmed: (name: string, confirmed: boolean) => void
@@ -48,6 +96,7 @@ export const useStore = create<AppState>((set) => ({
   packNames: [],
   pages: [],
   pageIdx: 0,
+  fileKey: '',
   sheetName: '',
   params: [],
   supplied: {},
@@ -56,8 +105,13 @@ export const useStore = create<AppState>((set) => ({
   tab: 'values',
 
   setPacks: (rules, packNames) => set({ rules, packNames }),
-  openReview: (sheetName, pages, params) =>
-    set({ stage: 'workspace', sheetName, pages, pageIdx: 0, params, supplied: {}, reviewerActions: {}, focusParam: null, tab: 'values' }),
+  openReview: (sheetName, pages, params, fileKey = '', restore) =>
+    set({
+      stage: 'workspace', sheetName, pages, pageIdx: 0, params, fileKey,
+      supplied: restore?.supplied ?? {},
+      reviewerActions: restore?.reviewerActions ?? {},
+      focusParam: null, tab: 'values',
+    }),
   setPageIdx: (idx) => set({ pageIdx: idx, focusParam: null }),
   setParamValue: (name, value) =>
     set((s) => ({
@@ -84,9 +138,13 @@ export const useStore = create<AppState>((set) => ({
     })),
   setFocusParam: (name) => set({ focusParam: name }),
   setTab: (tab) => set({ tab }),
-  reset: () =>
-    set({ stage: 'upload', pages: [], pageIdx: 0, sheetName: '', params: [], supplied: {}, reviewerActions: {}, focusParam: null, tab: 'values' }),
+  reset: () => {
+    clearDraft()
+    set({ stage: 'upload', pages: [], pageIdx: 0, fileKey: '', sheetName: '', params: [], supplied: {}, reviewerActions: {}, focusParam: null, tab: 'values' })
+  },
 }))
+
+useStore.subscribe(saveDraft)
 
 /** All params fed to the engine: extracted + reviewer-supplied limits (confidence 1, confirmed). */
 export function effectiveParams(params: ExtractedParam[], supplied: Record<string, number>): ExtractedParam[] {
