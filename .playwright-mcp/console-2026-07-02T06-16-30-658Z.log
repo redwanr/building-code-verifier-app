@@ -1,4 +1,0 @@
-[     333ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/building-code-verifier-app/node_modules/.vite/deps/react-dom_client.js?v=c5b544b7:14335
-[  122162ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/building-code-verifier-app/@vite/client:992
-[  134858ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/building-code-verifier-app/node_modules/.vite/deps/react-dom_client.js?v=40f10985:14335
-[  134990ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://localhost:5173/building-code-verifier-app/:0

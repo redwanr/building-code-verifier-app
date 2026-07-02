@@ -1,4 +1,0 @@
-[     214ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/building-code-verifier-app/node_modules/.vite/deps/react-dom_client.js?v=40f10985:14335
-[     342ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) @ http://localhost:5173/building-code-verifier-app/:0
-[   40082ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/building-code-verifier-app/node_modules/.vite/deps/react-dom_client.js?v=40f10985:14335
-[   40209ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) @ http://localhost:5173/building-code-verifier-app/:0
