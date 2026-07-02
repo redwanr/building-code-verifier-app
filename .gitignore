@@ -6,3 +6,5 @@ e2e_out/
 tests/*.pdf
 *.pyc
 .DS_Store
+.playwright-mcp/
+.claude/

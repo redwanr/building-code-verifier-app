@@ -41,6 +41,28 @@ URL is shared.
 - `extraction.py` — pdf2image → provider-switched vision call (Claude `claude-opus-4-8` default, Gemini via `GEMINI_MODEL`). Confidence < 0.7 → unconfirmed.
 - `app.py` — Streamlit flow: password gate → upload → confirmation gate → findings → export.
 
+## SPA v3 (branch `spa-v3`, 2026-07-01) — drawing-first rebuild off Streamlit
+
+Full product revamp on this branch, replacing the Streamlit UI (which stays
+live on main until founder-approved cutover). Static React SPA (GitHub Pages)
++ Cloudflare Worker key-holding proxy. Decision log: `~/.claude/plans/shiny-percolating-barto.md`.
+
+- `web/` — Vite+React+TS. Drawing-first workspace: pdf.js renders the sheet
+  in-browser, extracted values are crosshair pins (bbox), review panel with
+  live rule re-eval on every confirm (FR-9 keeps unconfirmed → cannot
+  evaluate). Drafting-room-dark design, IBM Plex + clay. Demo mode uses a
+  synthetic SVG G+9 sheet (`web/src/demo/demoSheet.ts`).
+- `web/src/engine/rules.ts` — TS port of rules.py; same YAML packs (synced to
+  `web/public/rule_packs` at build); parity tests from test_rules.py.
+- `worker/` — ~110-line authenticated forwarder (password + provider keys).
+  Deploy guide in `worker/README.md`; local dev via `.dev.vars` (gitignored).
+- Commands: `cd web && npm test` (vitest, 29) · `npm run dev` (demo) ·
+  `VITE_WORKER_URL=http://localhost:8787 npm run dev` + `cd worker && npx
+  wrangler dev` (live extraction, e2e-verified against the Uttara fixture).
+- Cutover checklist: deploy worker (needs Cloudflare login), set
+  `VITE_WORKER_URL` repo Actions variable, enable Pages (build_type
+  workflow), merge, founder demo, then retire Streamlit.
+
 ## Project status & next steps (as of 2026-06-17)
 
 **MVP implemented and DEPLOYED LIVE to Streamlit Community Cloud for partner testing (2026-06-17).** Tests green, repo at https://github.com/redwanr/building-code-verifier-app (private). Full decision log in `~/.claude/plans/cozy-churning-orbit.md` (grill-me interview: Streamlit monolith, vision-LLM-only extraction, Claude Opus 4.8 default + Gemini option, simpleeval YAML rules, provisional [VERIFY] thresholds capped at needs-verification, user-supplied permissible FAR/MGC at gate, session-only persistence, MD/HTML export, shared-password gate). Sidebar provider defaults to **gemini** (cloud secrets only carry a Gemini key). Gemini `gemini-3.5-flash` VERIFIED working e2e against the real firm sheet `tests/Uttara15C1 _ architectural.pdf` (gitignored). Done since 06-12: ✅ secrets, ✅ Gemini model verified, ✅ deploy. Partner explainer: `docs/How-The-MVP-Works.docx`.

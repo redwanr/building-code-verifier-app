@@ -1,0 +1,35 @@
+{
+  "name": "web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "sync-packs": "rm -rf public/rule_packs && mkdir -p public/rule_packs && cp ../rule_packs/*.yaml public/rule_packs/ && node -e \"const fs=require('fs');fs.writeFileSync('public/rule_packs/index.json',JSON.stringify(fs.readdirSync('public/rule_packs').filter(f=>f.endsWith('.yaml'))))\"",
+    "predev": "npm run sync-packs",
+    "prebuild": "npm run sync-packs",
+    "pretest": "npm run sync-packs",
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "test": "vitest run",
+    "lint": "oxlint",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "pdfjs-dist": "^6.1.200",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^24.13.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "js-yaml": "^5.2.1",
+    "oxlint": "^1.71.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.1.1",
+    "vitest": "^4.1.9"
+  }
+}
