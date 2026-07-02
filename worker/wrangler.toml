@@ -1,0 +1,8 @@
+name = "rajuk-verifier-proxy"
+main = "src/index.ts"
+compatibility_date = "2026-06-01"
+
+# Secrets (set via `wrangler secret put <NAME>`):
+#   APP_PASSWORD        — shared reviewer password; checked on every call
+#   GEMINI_API_KEY      — Gemini (default provider)
+#   ANTHROPIC_API_KEY   — Claude (optional)
