@@ -1,32 +1,25 @@
-# React + TypeScript + Vite
+# RAJUK Verifier — v3 SPA
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Drawing-first review workspace. Static React app (GitHub Pages) + a tiny
+Cloudflare Worker proxy (`../worker`) that holds the LLM keys.
 
-Currently, two official plugins are available:
+- pdf.js rasterizes the permit sheet **in the browser**; page images go only
+  to the vision model via the worker (no-training API tier).
+- The rule engine runs client-side (`src/engine/rules.ts`) over the **same
+  YAML packs** as the Python engine (`../rule_packs`, synced into
+  `public/rule_packs` at build). FR-9/FR-10 semantics are covered by a
+  parity test suite ported from `tests/test_rules.py`.
+- Demo mode needs no worker, no key, no upload: a synthetic G+9 sheet
+  (`src/demo/demoSheet.ts` — real fixtures are confidential).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev     # http://localhost:5173/building-code-verifier-app/ (demo mode)
+VITE_WORKER_URL=http://localhost:8787 npm run dev   # with local worker → live extraction
+npm test        # vitest: engine parity, extraction parse, report render, demo fixture
+npm run build   # tsc + vite → dist/
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Deploys to GitHub Pages from `.github/workflows/pages.yml` on push to main.
+Set the `VITE_WORKER_URL` Actions **variable** to the deployed worker URL so
+live extraction works on Pages (without it the app is demo-only).

@@ -32,6 +32,8 @@ jobs:
         working-directory: web
       - run: npm run build
         working-directory: web
+        env:
+          VITE_WORKER_URL: ${{ vars.VITE_WORKER_URL }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -1,0 +1,190 @@
+- generic [ref=f3e3]:
+  - banner [ref=f3e4]:
+    - generic [ref=f3e6]:
+      - generic [ref=f3e7]: RAJUK Verifier
+      - generic [ref=f3e8]: permit-sheet triage · decision support
+    - generic [ref=f3e30]:
+      - generic [ref=f3e31]: bnbc-2020@2020-01-01
+      - generic [ref=f3e33]: rajuk-dap-2025@2025-09-01
+    - generic [ref=f3e39]: Uttara15C1 _ architectural.pdf
+    - button "New review" [ref=f3e40] [cursor=pointer]
+    - button "Export report" [disabled] [ref=f3e41]
+  - generic [ref=f3e9]:
+    - generic [ref=f3e10]: Decision-support only — not a certification.
+    - generic [ref=f3e11]: A licensed professional must verify every value.
+    - button "full notice" [ref=f3e12] [cursor=pointer]
+  - main [ref=f3e42]:
+    - generic [ref=f3e43]:
+      - generic [ref=f3e44]:
+        - img "Permit sheet" [ref=f3e45]
+        - button "num_storeys = 10" [ref=f3e46] [cursor=pointer]
+        - button "plot_area_m2 = 200.67" [ref=f3e47] [cursor=pointer]
+        - button "claimed_far = 4.25" [ref=f3e48] [cursor=pointer]
+        - button "claimed_mgc_pct = 64" [ref=f3e49] [cursor=pointer]
+        - button "parking_provided_table = 4" [ref=f3e50] [cursor=pointer]
+        - button "parking_count_on_plan = 4" [ref=f3e51] [cursor=pointer]
+        - button "num_units = 8" [ref=f3e52] [cursor=pointer]
+        - button "num_exit_stairs = 1" [ref=f3e53] [cursor=pointer]
+        - button "num_lifts = 1" [ref=f3e54] [cursor=pointer]
+        - button "building_height_m = 35" [ref=f3e55] [cursor=pointer]
+      - generic [ref=f3e56]:
+        - button "Zoom out" [ref=f3e57] [cursor=pointer]: −
+        - generic [ref=f3e58]: 9%
+        - button "Zoom in" [ref=f3e59] [cursor=pointer]: +
+        - button "fit" [ref=f3e60] [cursor=pointer]
+    - complementary [ref=f3e61]:
+      - generic [ref=f3e62]:
+        - generic [ref=f3e63]:
+          - generic [ref=f3e64]: "0"
+          - generic [ref=f3e65]: Likely violation
+        - generic [ref=f3e66]:
+          - generic [ref=f3e67]: "10"
+          - generic [ref=f3e68]: Needs verification
+        - generic [ref=f3e69]:
+          - generic [ref=f3e70]: "1"
+          - generic [ref=f3e71]: Appears compliant
+      - tablist [ref=f3e72]:
+        - tab "VALUES" [selected] [ref=f3e73] [cursor=pointer]
+        - tab "CHECKS11" [ref=f3e74] [cursor=pointer]
+      - generic [ref=f3e75]:
+        - generic [ref=f3e76]: Checks only use values you confirm. Low-confidence reads wait for you — nothing passes on a guess.
+        - generic [ref=f3e77]: Confirmed reads
+        - generic [ref=f3e78] [cursor=pointer]:
+          - generic [ref=f3e79]: num_storeyscount
+          - generic [ref=f3e83]: "0.95"
+          - generic [ref=f3e84]:
+            - spinbutton [ref=f3e85]: "10"
+            - button "✓ confirmed" [disabled] [ref=f3e86]
+          - generic [ref=f3e87]: feeds BNBC-EGRESS-001
+        - generic [ref=f3e88] [cursor=pointer]:
+          - generic [ref=f3e89]: plot_area_m2m2
+          - generic [ref=f3e93]: "0.95"
+          - generic [ref=f3e94]:
+            - spinbutton [ref=f3e95]: "200.67"
+            - button "✓ confirmed" [disabled] [ref=f3e96]
+          - generic [ref=f3e97]: feeds RAJUK-FAR-003-CONSISTENCY
+        - generic [ref=f3e98] [cursor=pointer]:
+          - generic [ref=f3e99]: claimed_farratio
+          - generic [ref=f3e103]: "0.90"
+          - generic [ref=f3e104]:
+            - spinbutton [ref=f3e105]: "4.25"
+            - button "✓ confirmed" [disabled] [ref=f3e106]
+          - generic [ref=f3e107]: feeds RAJUK-FAR-003-LIMIT · RAJUK-FAR-003-CONSISTENCY
+        - generic [ref=f3e108] [cursor=pointer]:
+          - generic [ref=f3e109]: claimed_mgc_pctpercent
+          - generic [ref=f3e113]: "0.90"
+          - generic [ref=f3e114]:
+            - spinbutton [ref=f3e115]: "64"
+            - button "✓ confirmed" [disabled] [ref=f3e116]
+          - generic [ref=f3e117]: feeds RAJUK-MGC-004
+        - generic [ref=f3e118] [cursor=pointer]:
+          - generic [ref=f3e119]: parking_provided_tablecount
+          - generic [ref=f3e123]: "0.95"
+          - generic [ref=f3e124]:
+            - spinbutton [ref=f3e125]: "4"
+            - button "✓ confirmed" [disabled] [ref=f3e126]
+          - generic [ref=f3e127]: feeds RAJUK-PARKING-006-CONSISTENCY
+        - generic [ref=f3e128] [cursor=pointer]:
+          - generic [ref=f3e129]: parking_count_on_plancount
+          - generic [ref=f3e133]: "0.95"
+          - generic [ref=f3e134]:
+            - spinbutton [ref=f3e135]: "4"
+            - button "✓ confirmed" [disabled] [ref=f3e136]
+          - generic [ref=f3e137]: feeds RAJUK-PARKING-006-CONSISTENCY
+        - generic [ref=f3e138] [cursor=pointer]:
+          - generic [ref=f3e139]: num_unitscount
+          - generic [ref=f3e143]: "0.95"
+          - generic [ref=f3e144]:
+            - spinbutton [ref=f3e145]: "8"
+            - button "✓ confirmed" [disabled] [ref=f3e146]
+        - generic [ref=f3e147] [cursor=pointer]:
+          - generic [ref=f3e148]: num_exit_stairscount
+          - generic [ref=f3e152]: "0.90"
+          - generic [ref=f3e153]:
+            - spinbutton [ref=f3e154]: "1"
+            - button "✓ confirmed" [disabled] [ref=f3e155]
+          - generic [ref=f3e156]: feeds BNBC-EGRESS-001
+        - generic [ref=f3e157] [cursor=pointer]:
+          - generic [ref=f3e158]: num_liftscount
+          - generic [ref=f3e162]: "0.90"
+          - generic [ref=f3e163]:
+            - spinbutton [ref=f3e164]: "1"
+            - button "✓ confirmed" [disabled] [ref=f3e165]
+          - generic [ref=f3e166]: feeds BNBC-LIFT-009
+        - generic [ref=f3e167] [cursor=pointer]:
+          - generic [ref=f3e168]: building_height_mm
+          - generic [ref=f3e172]: "0.85"
+          - generic [ref=f3e173]:
+            - spinbutton [ref=f3e174]: "35"
+            - button "✓ confirmed" [disabled] [ref=f3e175]
+          - generic [ref=f3e176]: feeds BNBC-EGRESS-001 · BNBC-FIRE-002 · BNBC-LIFT-009
+        - generic [ref=f3e177]: You supply (17)
+        - generic [ref=f3e178]: Ward/LUC-specific limits the sheet can't state. Leave blank and the rule reports “cannot evaluate”.
+        - generic [ref=f3e179] [cursor=pointer]:
+          - generic [ref=f3e180]: allowable_mgc_pct
+          - spinbutton "—" [ref=f3e182]
+          - generic [ref=f3e183]: feeds RAJUK-MGC-004
+        - generic [ref=f3e184] [cursor=pointer]:
+          - generic [ref=f3e185]: exit_stair_width_m
+          - spinbutton "—" [ref=f3e187]
+          - generic [ref=f3e188]: feeds BNBC-STAIRWIDTH-008
+        - generic [ref=f3e189] [cursor=pointer]:
+          - generic [ref=f3e190]: front_setback_m
+          - spinbutton "—" [ref=f3e192]
+          - generic [ref=f3e193]: feeds RAJUK-SETBACK-005
+        - generic [ref=f3e194] [cursor=pointer]:
+          - generic [ref=f3e195]: min_room_area_m2
+          - spinbutton "—" [ref=f3e197]
+          - generic [ref=f3e198]: feeds BNBC-ROOM-007
+        - generic [ref=f3e199] [cursor=pointer]:
+          - generic [ref=f3e200]: min_room_width_m
+          - spinbutton "—" [ref=f3e202]
+          - generic [ref=f3e203]: feeds BNBC-ROOM-007
+        - generic [ref=f3e204] [cursor=pointer]:
+          - generic [ref=f3e205]: min_stair_width_m
+          - spinbutton "—" [ref=f3e207]
+          - generic [ref=f3e208]: feeds BNBC-STAIRWIDTH-008
+        - generic [ref=f3e209] [cursor=pointer]:
+          - generic [ref=f3e210]: parking_provided
+          - spinbutton "—" [ref=f3e212]
+          - generic [ref=f3e213]: feeds RAJUK-PARKING-006-RATIO
+        - generic [ref=f3e214] [cursor=pointer]:
+          - generic [ref=f3e215]: parking_required
+          - spinbutton "—" [ref=f3e217]
+          - generic [ref=f3e218]: feeds RAJUK-PARKING-006-RATIO
+        - generic [ref=f3e219] [cursor=pointer]:
+          - generic [ref=f3e220]: permissible_far
+          - spinbutton "—" [ref=f3e222]
+          - generic [ref=f3e223]: feeds RAJUK-FAR-003-LIMIT
+        - generic [ref=f3e224] [cursor=pointer]:
+          - generic [ref=f3e225]: rear_setback_m
+          - spinbutton "—" [ref=f3e227]
+          - generic [ref=f3e228]: feeds RAJUK-SETBACK-005
+        - generic [ref=f3e229] [cursor=pointer]:
+          - generic [ref=f3e230]: required_front_setback_m
+          - spinbutton "—" [ref=f3e232]
+          - generic [ref=f3e233]: feeds RAJUK-SETBACK-005
+        - generic [ref=f3e234] [cursor=pointer]:
+          - generic [ref=f3e235]: required_rear_setback_m
+          - spinbutton "—" [ref=f3e237]
+          - generic [ref=f3e238]: feeds RAJUK-SETBACK-005
+        - generic [ref=f3e239] [cursor=pointer]:
+          - generic [ref=f3e240]: required_side_setback_m
+          - spinbutton "—" [ref=f3e242]
+          - generic [ref=f3e243]: feeds RAJUK-SETBACK-005
+        - generic [ref=f3e244] [cursor=pointer]:
+          - generic [ref=f3e245]: room_area_m2
+          - spinbutton "—" [ref=f3e247]
+          - generic [ref=f3e248]: feeds BNBC-ROOM-007
+        - generic [ref=f3e249] [cursor=pointer]:
+          - generic [ref=f3e250]: room_width_m
+          - spinbutton "—" [ref=f3e252]
+          - generic [ref=f3e253]: feeds BNBC-ROOM-007
+        - generic [ref=f3e254] [cursor=pointer]:
+          - generic [ref=f3e255]: side_setback_m
+          - spinbutton "—" [ref=f3e257]
+          - generic [ref=f3e258]: feeds RAJUK-SETBACK-005
+        - generic [ref=f3e259] [cursor=pointer]:
+          - generic [ref=f3e260]: total_floor_area_m2
+          - spinbutton "—" [ref=f3e262]
+          - generic [ref=f3e263]: feeds RAJUK-FAR-003-CONSISTENCY

@@ -1,0 +1,23 @@
+- generic [ref=f1e3]:
+  - banner [ref=f1e4]:
+    - generic [ref=f1e6]:
+      - generic [ref=f1e7]: RAJUK Verifier
+      - generic [ref=f1e8]: permit-sheet triage · decision support
+  - generic [ref=f1e9]:
+    - generic [ref=f1e10]: Decision-support only — not a certification.
+    - generic [ref=f1e11]: A licensed professional must verify every value.
+    - button "full notice" [ref=f1e12] [cursor=pointer]
+  - generic [ref=f1e13]:
+    - generic [ref=f1e14]:
+      - heading "Put the sheet on the table" [level=1] [ref=f1e15]
+      - paragraph [ref=f1e16]: Drop a RAJUK permit sheet (raster PDF). It renders in your browser; page images go only to the extraction model on a no-training API tier. Checks run as you confirm each read.
+    - button "PDF · ≤ 2 pages · rendered in your browser extraction proxy not configured — demo only RAJUK VERIFIER DECISION SUPPORT — NOT CERTIFICATION" [ref=f1e17]:
+      - generic [ref=f1e18]: PDF · ≤ 2 pages · rendered in your browser
+      - generic [ref=f1e19]: extraction proxy not configured — demo only
+      - generic [ref=f1e20]:
+        - text: RAJUK VERIFIER
+        - text: DECISION SUPPORT — NOT CERTIFICATION
+    - generic [ref=f1e21]:
+      - text: No sheet at hand?
+      - button "Open the demo review" [ref=f1e22] [cursor=pointer]
+      - text: — a synthetic G+9 sheet, no upload, no API credits.

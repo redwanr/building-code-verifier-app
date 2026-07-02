@@ -1,0 +1,183 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - generic [ref=e7]: RAJUK Verifier
+      - generic [ref=e8]: permit-sheet triage · decision support
+    - generic [ref=e23]:
+      - generic [ref=e24]: bnbc-2020@2020-01-01
+      - generic [ref=e26]: rajuk-dap-2025@2025-09-01
+    - generic [ref=e28]: synthetic-demo-g9.svg
+    - button "New review" [ref=e29] [cursor=pointer]
+    - button "Export report" [disabled] [ref=e30]
+  - generic [ref=e9]:
+    - generic [ref=e10]: Decision-support only — not a certification.
+    - generic [ref=e11]: A licensed professional must verify every value.
+    - button "full notice" [ref=e12] [cursor=pointer]
+  - main [ref=e31]:
+    - generic [ref=e32]:
+      - generic [ref=e33]:
+        - img "Permit sheet" [ref=e34]
+        - button "building_height_m = 35" [ref=e35] [cursor=pointer]
+        - button "num_storeys = 10" [ref=e36] [cursor=pointer]
+        - button "plot_area_m2 = 200" [ref=e37] [cursor=pointer]
+        - button "total_floor_area_m2 = 840" [ref=e38] [cursor=pointer]
+        - button "claimed_far = 4.2" [ref=e39] [cursor=pointer]
+        - button "claimed_mgc_pct = 58" [ref=e40] [cursor=pointer]
+        - button "num_exit_stairs = 1" [ref=e41] [cursor=pointer]
+        - button "exit_stair_width_m = 1.2" [ref=e42] [cursor=pointer]
+        - button "num_lifts = 2" [ref=e43] [cursor=pointer]
+        - button "parking_provided = 8" [ref=e44] [cursor=pointer]
+        - button "parking_provided_table = 8" [ref=e45] [cursor=pointer]
+        - button "parking_count_on_plan = 6" [ref=e46] [cursor=pointer]
+        - button "num_units = 36" [ref=e47] [cursor=pointer]
+        - button "front_setback_m = 1.5" [ref=e48] [cursor=pointer]
+        - button "rear_setback_m = 1" [ref=e49] [cursor=pointer]
+        - button "side_setback_m = 1.25" [ref=e50] [cursor=pointer]
+        - button "has_fire_alarm = true" [ref=e51] [cursor=pointer]
+        - button "has_fire_hydrant_standpipe = false" [ref=e52] [cursor=pointer]
+        - button "has_fire_rated_stair_enclosure = true" [ref=e53] [cursor=pointer]
+        - button "has_firefighting_lift = false" [ref=e54] [cursor=pointer]
+      - generic [ref=e55]:
+        - button "Zoom out" [ref=e56] [cursor=pointer]: −
+        - generic [ref=e57]: 61%
+        - button "Zoom in" [ref=e58] [cursor=pointer]: +
+        - button "fit" [ref=e59] [cursor=pointer]
+    - complementary [ref=e60]:
+      - generic [ref=e61]:
+        - generic [ref=e62]:
+          - generic [ref=e63]: "1"
+          - generic [ref=e64]: Likely violation
+        - generic [ref=e65]:
+          - generic [ref=e66]: "10"
+          - generic [ref=e67]: Needs verification
+        - generic [ref=e68]:
+          - generic [ref=e69]: "0"
+          - generic [ref=e70]: Appears compliant
+      - tablist [ref=e71]:
+        - tab "VALUES4 to confirm" [ref=e72] [cursor=pointer]:
+          - text: VALUES
+          - generic [ref=e73]: 4 to confirm
+        - tab "CHECKS11" [active] [selected] [ref=e74] [cursor=pointer]
+      - generic [ref=e75]:
+        - generic [ref=e339]:
+          - generic [ref=e340]:
+            - text: Likely violation
+            - generic [ref=e342]: "1"
+          - generic [ref=e343]:
+            - button "Medium RAJUK-PARKING-006-CONSISTENCY RAJUK" [ref=e344] [cursor=pointer]:
+              - generic [ref=e345]: Medium
+              - generic [ref=e346]: RAJUK-PARKING-006-CONSISTENCY
+              - generic [ref=e347]: RAJUK
+            - generic [ref=e348]: "Parking table consistent with count shown on plan: check failed on confirmed inputs."
+            - generic [ref=e349]:
+              - 'button "parking_provided_table: 8" [ref=e350] [cursor=pointer]'
+              - 'button "parking_count_on_plan: 6" [ref=e351] [cursor=pointer]'
+        - generic [ref=e352]:
+          - generic [ref=e353]:
+            - text: Needs verification
+            - generic [ref=e355]: "10"
+          - generic [ref=e356]:
+            - button "Critical BNBC-EGRESS-001 BNBC" [ref=e357] [cursor=pointer]:
+              - generic [ref=e358]: Critical
+              - generic [ref=e359]: BNBC-EGRESS-001
+              - generic [ref=e360]: BNBC
+            - generic [ref=e361]:
+              - text: Cannot evaluate — needs
+              - button "num_exit_stairs" [ref=e363] [cursor=pointer]
+          - generic [ref=e364]:
+            - button "Critical BNBC-FIRE-002 BNBC" [ref=e365] [cursor=pointer]:
+              - generic [ref=e366]: Critical
+              - generic [ref=e367]: BNBC-FIRE-002
+              - generic [ref=e368]: BNBC
+            - generic [ref=e369]:
+              - text: "High-rise (>20 m) fire provisions for A-3 (presence check): check failed on confirmed inputs. Threshold is"
+              - generic [ref=e370]: "[VERIFY] (2025/2026 rules in flux) — expert must confirm the value before relying on this."
+            - 'button "building_height_m: 35" [ref=e372] [cursor=pointer]'
+          - generic [ref=e373]:
+            - button "High BNBC-STAIRWIDTH-008 BNBC" [ref=e374] [cursor=pointer]:
+              - generic [ref=e375]: High
+              - generic [ref=e376]: BNBC-STAIRWIDTH-008
+              - generic [ref=e377]: BNBC
+            - generic [ref=e378]:
+              - text: Cannot evaluate — needs
+              - button "min_stair_width_m" [ref=e380] [cursor=pointer]
+          - generic [ref=e381]:
+            - button "High BNBC-LIFT-009 BNBC" [ref=e382] [cursor=pointer]:
+              - generic [ref=e383]: High
+              - generic [ref=e384]: BNBC-LIFT-009
+              - generic [ref=e385]: BNBC
+            - generic [ref=e386]:
+              - text: "Lift / fire-lift provision for height: check failed on confirmed inputs. Threshold is"
+              - generic [ref=e387]: "[VERIFY] (2025/2026 rules in flux) — expert must confirm the value before relying on this."
+            - generic [ref=e388]:
+              - 'button "building_height_m: 35" [ref=e389] [cursor=pointer]'
+              - 'button "num_lifts: 2" [ref=e390] [cursor=pointer]'
+          - generic [ref=e391]:
+            - button "High RAJUK-FAR-003-LIMIT RAJUK" [ref=e392] [cursor=pointer]:
+              - generic [ref=e393]: High
+              - generic [ref=e394]: RAJUK-FAR-003-LIMIT
+              - generic [ref=e395]: RAJUK
+            - generic [ref=e396]:
+              - text: Cannot evaluate — needs
+              - button "claimed_far" [ref=e398] [cursor=pointer]
+              - generic [ref=e399]:
+                - text: ","
+                - button "permissible_far" [ref=e400] [cursor=pointer]
+          - generic [ref=e401]:
+            - button "High RAJUK-FAR-003-CONSISTENCY RAJUK" [ref=e402] [cursor=pointer]:
+              - generic [ref=e403]: High
+              - generic [ref=e404]: RAJUK-FAR-003-CONSISTENCY
+              - generic [ref=e405]: RAJUK
+            - generic [ref=e406]:
+              - text: Cannot evaluate — needs
+              - button "claimed_far" [ref=e408] [cursor=pointer]
+          - generic [ref=e409]:
+            - button "High RAJUK-MGC-004 RAJUK" [ref=e410] [cursor=pointer]:
+              - generic [ref=e411]: High
+              - generic [ref=e412]: RAJUK-MGC-004
+              - generic [ref=e413]: RAJUK
+            - generic [ref=e414]:
+              - text: Cannot evaluate — needs
+              - button "allowable_mgc_pct" [ref=e416] [cursor=pointer]
+          - generic [ref=e417]:
+            - button "High RAJUK-SETBACK-005 RAJUK" [ref=e418] [cursor=pointer]:
+              - generic [ref=e419]: High
+              - generic [ref=e420]: RAJUK-SETBACK-005
+              - generic [ref=e421]: RAJUK
+            - generic [ref=e422]:
+              - text: Cannot evaluate — needs
+              - button "rear_setback_m" [ref=e424] [cursor=pointer]
+              - generic [ref=e425]:
+                - text: ","
+                - button "required_front_setback_m" [ref=e426] [cursor=pointer]
+              - generic [ref=e427]:
+                - text: ","
+                - button "required_rear_setback_m" [ref=e428] [cursor=pointer]
+              - generic [ref=e429]:
+                - text: ","
+                - button "required_side_setback_m" [ref=e430] [cursor=pointer]
+          - generic [ref=e431]:
+            - button "Medium BNBC-ROOM-007 BNBC" [ref=e432] [cursor=pointer]:
+              - generic [ref=e433]: Medium
+              - generic [ref=e434]: BNBC-ROOM-007
+              - generic [ref=e435]: BNBC
+            - generic [ref=e436]:
+              - text: Cannot evaluate — needs
+              - button "room_area_m2" [ref=e438] [cursor=pointer]
+              - generic [ref=e439]:
+                - text: ","
+                - button "room_width_m" [ref=e440] [cursor=pointer]
+              - generic [ref=e441]:
+                - text: ","
+                - button "min_room_area_m2" [ref=e442] [cursor=pointer]
+              - generic [ref=e443]:
+                - text: ","
+                - button "min_room_width_m" [ref=e444] [cursor=pointer]
+          - generic [ref=e445]:
+            - button "Medium RAJUK-PARKING-006-RATIO RAJUK" [ref=e446] [cursor=pointer]:
+              - generic [ref=e447]: Medium
+              - generic [ref=e448]: RAJUK-PARKING-006-RATIO
+              - generic [ref=e449]: RAJUK
+            - generic [ref=e450]:
+              - text: Cannot evaluate — needs
+              - button "parking_required" [ref=e452] [cursor=pointer]

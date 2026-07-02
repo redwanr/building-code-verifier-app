@@ -1,0 +1,35 @@
+- generic [ref=f3e3]:
+  - banner [ref=f3e4]:
+    - generic [ref=f3e6]:
+      - generic [ref=f3e7]: RAJUK Verifier
+      - generic [ref=f3e8]: permit-sheet triage · decision support
+    - generic [ref=f3e30]:
+      - generic [ref=f3e31]: bnbc-2020@2020-01-01
+      - generic [ref=f3e33]: rajuk-dap-2025@2025-09-01
+  - generic [ref=f3e9]:
+    - generic [ref=f3e10]: Decision-support only — not a certification.
+    - generic [ref=f3e11]: A licensed professional must verify every value.
+    - button "full notice" [ref=f3e12] [cursor=pointer]
+  - generic [ref=f3e13]:
+    - generic [ref=f3e14]:
+      - heading "Put the sheet on the table" [level=1] [ref=f3e15]
+      - paragraph [ref=f3e16]: Drop a RAJUK permit sheet (raster PDF). It renders in your browser; page images go only to the extraction model on a no-training API tier. Checks run as you confirm each read.
+    - button "Choose File Reading page 1 of 1 with gemini… RAJUK VERIFIER DECISION SUPPORT — NOT CERTIFICATION" [ref=f3e37]:
+      - button "Choose File" [active] [ref=f3e36]
+      - generic [ref=f3e38]: Reading page 1 of 1 with gemini…
+      - generic [ref=f3e20]:
+        - text: RAJUK VERIFIER
+        - text: DECISION SUPPORT — NOT CERTIFICATION
+    - generic [ref=f3e21]:
+      - generic [ref=f3e22]:
+        - generic [ref=f3e23]: reviewer password
+        - textbox "reviewer password" [ref=f3e24]: demo
+      - generic [ref=f3e25]:
+        - generic [ref=f3e26]: extraction model
+        - combobox "extraction model" [ref=f3e27]:
+          - option "Gemini" [selected]
+          - option "Claude"
+    - generic [ref=f3e28]:
+      - text: No sheet at hand?
+      - button "Open the demo review" [ref=f3e29] [cursor=pointer]
+      - text: — a synthetic G+9 sheet, no upload, no API credits.

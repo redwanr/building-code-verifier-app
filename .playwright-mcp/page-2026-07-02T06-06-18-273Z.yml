@@ -1,0 +1,23 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - generic [ref=e7]: RAJUK Verifier
+      - generic [ref=e8]: permit-sheet triage · decision support
+  - generic [ref=e9]:
+    - generic [ref=e10]: Decision-support only — not a certification.
+    - generic [ref=e11]: A licensed professional must verify every value.
+    - button "full notice" [ref=e12] [cursor=pointer]
+  - generic [ref=e13]:
+    - generic [ref=e14]:
+      - heading "Put the sheet on the table" [level=1] [ref=e15]
+      - paragraph [ref=e16]: Drop a RAJUK permit sheet (raster PDF). The extractor reads the data tables, pins every value it finds on the drawing, and runs the code checks as you confirm each read.
+    - generic [ref=e17]:
+      - generic [ref=e18]: PDF · ≤ 2 pages · rendered in your browser
+      - generic [ref=e19]: live extraction arrives in the next build
+      - generic [ref=e20]:
+        - text: RAJUK VERIFIER
+        - text: DECISION SUPPORT — NOT CERTIFICATION
+    - generic [ref=e21]:
+      - text: No sheet at hand?
+      - button "Open the demo review" [ref=e22] [cursor=pointer]
+      - text: — a synthetic G+9 sheet, no upload, no API credits.
