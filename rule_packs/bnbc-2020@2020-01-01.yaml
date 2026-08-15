@@ -1,0 +1,90 @@
+# BNBC-2020 life-safety rule pack (egress, fire, room sizes, lifts).
+# Rules are data: edit values here, no code change (FR-10).
+# verify_flag: true => finding caps at "Needs verification" (screening trigger,
+# interpretation question, or presence-read reliability — see confidence_basis).
+# Every numeric value below traces to a verbatim BNBC-2020 quote in
+# docs/new_features/nirman-traceability.md (source: docs/new_features/bnbc-2020-text.txt).
+jurisdiction: bnbc-2020
+effective_date: "2020-01-01"
+source: BNBC-2020
+
+rules:
+  - id: BNBC-EGRESS-001
+    title: Minimum two means of egress (high-rise screening)
+    parameters: [num_storeys, building_height_m, num_exit_stairs]
+    logic: "num_exit_stairs >= 2 if (building_height_m > 20 or num_storeys > 6) else True"
+    severity: Critical
+    confidence_basis: "Screening trigger (>20 m / >6 storeys) [VERIFY] — intentionally stricter than the code letter. BNBC ties exit count to occupant load (<50 -> 1 exit; 50-500 -> 2), Sec 3.14.2; see BNBC-EGRESS-001B for the sourced occupant-load check."
+    citation: "BNBC-2020 Part 4 Ch 3 Sec 3.14 (Number of Exits) + Table 4.3.1"
+    remediation: "Provide a second independent, fire-separated exit stair."
+    verify_flag: true
+
+  - id: BNBC-EGRESS-001B
+    title: Exit count vs occupant load (residential 18 m2/person)
+    parameters: [floor_area_m2, num_exit_stairs]
+    logic: "(floor_area_m2 / 18 < 50 or num_exit_stairs >= 2) and (floor_area_m2 / 18 <= 500 or num_exit_stairs >= 3) and (floor_area_m2 / 18 <= 1000 or num_exit_stairs >= 4)"
+    severity: Critical
+    confidence_basis: "Exit bands and 18 m2 gross/person occupant load verbatim from BNBC (Sec 3.14.2, Table 4.3.1); [VERIFY] interpretation — code applies bands per 'space', encoded here per typical floor."
+    citation: "BNBC-2020 Part 4 Ch 3 Sec 3.14.2 (exit count by occupant load) + Table 4.3.1 (Residential: 18 gross)"
+    remediation: "Add exits/exit stairs until the count meets the occupant-load band for the floor area served."
+    verify_flag: true
+
+  - id: BNBC-FIRE-002
+    title: High-rise fire provisions for A-3 (presence check)
+    parameters: [building_height_m]
+    logic: "(param_present('has_fire_alarm') and param_present('has_fire_hydrant_standpipe') and param_present('has_fire_rated_stair_enclosure') and param_present('has_firefighting_lift')) if building_height_m > 20 else True"
+    severity: Critical
+    confidence_basis: "Provision list sourced (Sec 5.3.2(b): manual alarm + fixed hydrant in fire-stair landings/lift lobby; Sec 3.13 smoke-proof enclosure; Part 8 Sec 4.2.2.3 fireman's lift). Screening trigger 20 m [VERIFY] — code exempts A3 up to 33 m (Sec 5.3.2(a)); expert to confirm governing height."
+    citation: "BNBC-2020 Part 4 Ch 5 Sec 5.3.2 (Occupancy A3) + Part 4 Ch 3 Sec 3.13 + Part 8 Ch 4 Sec 4.2.2.3"
+    remediation: "Add manual fire alarm + fixed hydrant at fire-stair landings/lift lobby; fire-rate the stair enclosure; provide a fire-fighting lift."
+    verify_flag: true
+
+  - id: BNBC-ROOM-007
+    title: Minimum habitable room area/width (9.5 m2 / 2.9 m)
+    parameters: [room_area_m2, room_width_m]
+    logic: "room_area_m2 >= 9.5 and room_width_m >= 2.9"
+    severity: Medium
+    confidence_basis: "Primary-sourced firm: BNBC Part 3 Sec 1.14.2.2 — habitable rooms >= 9.5 m2 net, min width 2.9 m."
+    citation: "BNBC-2020 Part 3 Ch 1 Sec 1.14.2.2 (Room sizes)"
+    remediation: "Enlarge the habitable room to at least 9.5 m2 net floor area and 2.9 m width."
+    verify_flag: false
+
+  - id: BNBC-STAIRWIDTH-008
+    title: Minimum exit-stair width for A3 (1120 mm)
+    parameters: [exit_stair_width_m]
+    logic: "exit_stair_width_m >= 1.12"
+    severity: High
+    confidence_basis: "Primary-sourced firm: Table 4.3.6 — minimum width of each stairway for A3/A4/A5 = 1120 mm."
+    citation: "BNBC-2020 Part 4 Ch 3 Table 4.3.6 (Minimum Width of Stairways in Egress System)"
+    remediation: "Widen the exit stair to at least 1120 mm clear."
+    verify_flag: false
+
+  - id: BNBC-LIFT-009
+    title: Lift provision (>6 storeys or >20 m)
+    parameters: [num_storeys, building_height_m, num_lifts]
+    logic: "(num_lifts >= 1) if (building_height_m > 20 or num_storeys > 6) else True"
+    severity: High
+    confidence_basis: "Primary-sourced firm: Part 8 Sec 4.2.1.1 — 'Lifts shall be provided in buildings more than six storeys or 20 m in height.'"
+    citation: "BNBC-2020 Part 8 Ch 4 Sec 4.2.1.1 (Essential Requirements for Lifts)"
+    remediation: "Provide at least one passenger lift for the building height/storey count."
+    verify_flag: false
+
+  - id: BNBC-FIRELIFT-010
+    title: Fireman's lift for buildings 15 m or higher
+    parameters: [building_height_m]
+    logic: "param_present('has_firefighting_lift') if building_height_m >= 15 else True"
+    severity: High
+    confidence_basis: "Trigger primary-sourced firm (Part 8 Sec 4.2.2.3: >=15 m -> at least one fireman's lift). [VERIFY] presence-read reliability — absence on the sheet may be a notation gap, not a design gap."
+    citation: "BNBC-2020 Part 8 Ch 4 Sec 4.2.2.3 (Fireman's lift) + Part 4 Ch 2 Sec 2.11 (Fire Lifts)"
+    remediation: "Designate at least one lift as a fireman's lift (>=1.44 m2 car, 8-person/544 kg, 2-hr rated landing doors, ground-to-top within 60 s)."
+    verify_flag: true
+
+  - id: BNBC-TRAVEL-011
+    title: Maximum travel distance (A3 45 m / 60 m sprinklered)
+    parameters: [max_travel_distance_m]
+    logic: "max_travel_distance_m <= 60 if param_present('has_sprinkler_system') else max_travel_distance_m <= 45"
+    severity: High
+    confidence_basis: "Limits primary-sourced firm (Table 4.3.8, A3 row: 45 m unsprinklered / 60 m sprinklered). [VERIFY] input reliability — value must be stated on the egress plan/notes; the engine never measures geometry."
+    citation: "BNBC-2020 Part 4 Ch 3 Sec 3.15.2 + Table 4.3.8 (Maximum Travel Path, A3)"
+    remediation: "Rearrange exits or add a sprinkler system so the maximum travel path meets Table 4.3.8."
+    verify_flag: true

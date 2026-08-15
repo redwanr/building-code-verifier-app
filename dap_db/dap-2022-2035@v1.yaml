@@ -1,0 +1,47 @@
+# RAJUK Detailed Area Plan (DAP) 2022-2035 — per-ward FAR/MGC lookup (T-304, gap G-6).
+#
+# SCOPE, clarified 2026-07-26 — this file targets DAP Appendix 3.6 (the 68
+# density blocks), NOT Appendix 3.5.
+#
+# Appendix 3.5 (the plot FAR index, as replaced by S.R.O. 468-Ain/2025) is keyed
+# by area-group x building sub-class x road width — there is NO ward axis and no
+# plot-area axis in it, despite its "plot-based" title. It is also the SAME TABLE
+# as Imarat Nirman Bidhimala 2025 Table-5, whose A3 rows are already encoded in
+# `rule_packs/rajuk-dap-2025@2025-09-01.yaml` (rule RAJUK-FAR-ROADBAND-011 and
+# the `lookups:` block beside it), verified cell-for-cell against both sources.
+# Do not copy Appendix 3.5 values into the ward rows below — the schema cannot
+# express them and the rule pack already holds them.
+#
+# NO-INVENTION LAW (docs/new_features/nirman-ai-fable-prompt.md): every row's
+# `far`/`mgc_pct` must come from a verbatim quote of the DAP density-block
+# table (or the Bidhimala 2025 gazette), with a page/section citation. This
+# file ships with ZERO data rows deliberately — the founder/domain expert has
+# not yet supplied any verbatim DAP quotes (track C-3, `nirman-traceability.md`
+# gap G-6). Do NOT copy FAR/MGC numbers from memory, other jurisdictions, or
+# any uncited source. A dev adding rows without a citation violates the
+# no-invention law even if the number is "probably right".
+#
+# Row schema (see web/src/engine/dapDb.ts `DapRow` for the TS mirror):
+#   - ward: string            — RAJUK ward identifier, matched verbatim
+#                                against `Project.ward` (worker-api, T-101).
+#   - density_block: string | null
+#                              — DAP density-block code the ward falls in,
+#                                when the source table names one; null if the
+#                                quote gives a per-ward value directly.
+#   - far: number              — permissible Floor Area Ratio for the ward.
+#   - mgc_pct: number | null   — allowable Maximum Ground Coverage, percent;
+#                                null when the source row doesn't state one
+#                                (autofill then skips `allowable_mgc_pct`).
+#   - citation: string         — verbatim quote (Bengali kept verbatim where
+#                                the source is Bengali) + page/section ref.
+#                                Never paraphrase; never invent.
+#   - verify_flag: true        — always true until the domain expert clears
+#                                the OCR digits against the gazette scan
+#                                (same G-10 protocol as the rule packs).
+#
+# Data entry protocol (founder/expert task per T-304 spec item 4, not dev):
+# every row needs the verbatim quote + page ref before it can be added here.
+# Synthetic/test rows (e.g. `TEST-WARD-1`) belong ONLY in test fixtures —
+# never in this shipped file.
+
+rows: []
