@@ -18,6 +18,14 @@ rules:
     citation: "BNBC-2020 Part 4 Ch 3 Sec 3.14 (Number of Exits) + Table 4.3.1"
     remediation: "Provide a second independent, fire-separated exit stair."
     verify_flag: true
+    display:
+      kind: compare
+      fix_on: typical_floor
+      headline_fail: "A building this tall needs two exit stairs"
+      headline_pass: "Exit stair count appears to be enough for the building height"
+      action: "Show {limit} independent, fire-separated exit stairs; the sheet shows {found}."
+      rows:
+        - {found: num_exit_stairs, limit: 2, direction: min, when: "building_height_m > 20 or num_storeys > 6"}
 
   - id: BNBC-EGRESS-001B
     title: Exit count vs occupant load (residential 18 m2/person)
@@ -28,6 +36,16 @@ rules:
     citation: "BNBC-2020 Part 4 Ch 3 Sec 3.14.2 (exit count by occupant load) + Table 4.3.1 (Residential: 18 gross)"
     remediation: "Add exits/exit stairs until the count meets the occupant-load band for the floor area served."
     verify_flag: true
+    display:
+      kind: compare
+      fix_on: typical_floor
+      headline_fail: "Not enough exit stairs for the people on this floor"
+      headline_pass: "Exit stair count appears to be enough for the floor area"
+      action: "Show at least {limit} exit stairs for this floor area; the sheet shows {found}."
+      rows:
+        - {found: num_exit_stairs, limit: 2, direction: min, when: "floor_area_m2 / 18 >= 50"}
+        - {found: num_exit_stairs, limit: 3, direction: min, when: "floor_area_m2 / 18 > 500"}
+        - {found: num_exit_stairs, limit: 4, direction: min, when: "floor_area_m2 / 18 > 1000"}
 
   - id: BNBC-FIRE-002
     title: High-rise fire provisions for A-3 (presence check)
@@ -38,6 +56,17 @@ rules:
     citation: "BNBC-2020 Part 4 Ch 5 Sec 5.3.2 (Occupancy A3) + Part 4 Ch 3 Sec 3.13 + Part 8 Ch 4 Sec 4.2.2.3"
     remediation: "Add manual fire alarm + fixed hydrant at fire-stair landings/lift lobby; fire-rate the stair enclosure; provide a fire-fighting lift."
     verify_flag: true
+    display:
+      kind: presence
+      fix_on: typical_floor
+      headline_fail: "Fire safety items are not shown for this building height"
+      headline_pass: "Fire safety items appear to be shown"
+      action: "Show on the plans: {missing}."
+      rows:
+        - {require: has_fire_alarm, label: "Manual fire alarm", when: "building_height_m > 20"}
+        - {require: has_fire_hydrant_standpipe, label: "Fire hydrant at the stair landings", when: "building_height_m > 20"}
+        - {require: has_fire_rated_stair_enclosure, label: "Fire-rated stair enclosure", when: "building_height_m > 20"}
+        - {require: has_firefighting_lift, label: "Fire-fighting lift", when: "building_height_m > 20"}
 
   - id: BNBC-ROOM-007
     title: Minimum habitable room area/width (9.5 m2 / 2.9 m)
@@ -48,6 +77,14 @@ rules:
     citation: "BNBC-2020 Part 3 Ch 1 Sec 1.14.2.2 (Room sizes)"
     remediation: "Enlarge the habitable room to at least 9.5 m2 net floor area and 2.9 m width."
     verify_flag: false
+    display:
+      kind: compare
+      fix_on: typical_floor
+      headline_fail: "A habitable room is smaller than the minimum"
+      headline_pass: "Habitable room size appears to be within the minimum"
+      rows:
+        - {found: room_area_m2, limit: 9.5, direction: min, action: "Enlarge the room by {gap} to at least {limit}."}
+        - {found: room_width_m, limit: 2.9, direction: min, action: "Widen the room by {gap} to at least {limit}."}
 
   - id: BNBC-STAIRWIDTH-008
     title: Minimum exit-stair width for A3 (1120 mm)
@@ -58,6 +95,14 @@ rules:
     citation: "BNBC-2020 Part 4 Ch 3 Table 4.3.6 (Minimum Width of Stairways in Egress System)"
     remediation: "Widen the exit stair to at least 1120 mm clear."
     verify_flag: false
+    display:
+      kind: compare
+      fix_on: typical_floor
+      headline_fail: "Exit stair is narrower than the minimum"
+      headline_pass: "Exit stair width appears to be enough"
+      action: "Widen the exit stair by {gap} to at least {limit}."
+      rows:
+        - {found: exit_stair_width_m, limit: 1.12, direction: min}
 
   - id: BNBC-LIFT-009
     title: Lift provision (>6 storeys or >20 m)
@@ -68,6 +113,14 @@ rules:
     citation: "BNBC-2020 Part 8 Ch 4 Sec 4.2.1.1 (Essential Requirements for Lifts)"
     remediation: "Provide at least one passenger lift for the building height/storey count."
     verify_flag: false
+    display:
+      kind: compare
+      fix_on: typical_floor
+      headline_fail: "No lift is shown for a building this tall"
+      headline_pass: "Lift count appears to be enough for the building height"
+      action: "Show at least {limit} passenger lift; the sheet shows {found}."
+      rows:
+        - {found: num_lifts, limit: 1, direction: min, when: "building_height_m > 20 or num_storeys > 6"}
 
   - id: BNBC-FIRELIFT-010
     title: Fireman's lift for buildings 15 m or higher
@@ -78,6 +131,14 @@ rules:
     citation: "BNBC-2020 Part 8 Ch 4 Sec 4.2.2.3 (Fireman's lift) + Part 4 Ch 2 Sec 2.11 (Fire Lifts)"
     remediation: "Designate at least one lift as a fireman's lift (>=1.44 m2 car, 8-person/544 kg, 2-hr rated landing doors, ground-to-top within 60 s)."
     verify_flag: true
+    display:
+      kind: presence
+      fix_on: typical_floor
+      headline_fail: "A fire-fighting lift is not shown"
+      headline_pass: "A fire-fighting lift appears to be shown"
+      action: "Mark one lift as the fire-fighting lift on the plans."
+      rows:
+        - {require: has_firefighting_lift, label: "Fire-fighting lift", when: "building_height_m >= 15"}
 
   - id: BNBC-TRAVEL-011
     title: Maximum travel distance (A3 45 m / 60 m sprinklered)
@@ -88,3 +149,12 @@ rules:
     citation: "BNBC-2020 Part 4 Ch 3 Sec 3.15.2 + Table 4.3.8 (Maximum Travel Path, A3)"
     remediation: "Rearrange exits or add a sprinkler system so the maximum travel path meets Table 4.3.8."
     verify_flag: true
+    display:
+      kind: compare
+      fix_on: typical_floor
+      headline_fail: "Travel distance to an exit is longer than allowed"
+      headline_pass: "Travel distance to an exit appears to be within the limit"
+      action: "Shorten the travel path by {gap} to {limit}, or add exits."
+      rows:
+        - {found: max_travel_distance_m, limit: 60, direction: max, when: "param_present('has_sprinkler_system')"}
+        - {found: max_travel_distance_m, limit: 45, direction: max, when: "param_present('has_sprinkler_system') == False"}
