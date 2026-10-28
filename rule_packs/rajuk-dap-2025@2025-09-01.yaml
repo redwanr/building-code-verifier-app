@@ -269,6 +269,24 @@ rules:
         - {found: num_lifts, limit: 2, direction: min, when: "building_height_m > 33 or num_storeys > 10"}
         - {require: has_stretcher_lift, label: "Stretcher lift", headline: "A stretcher lift is not shown", when: "building_height_m > 33 or num_storeys > 10", action: "Designate one lift as a stretcher lift."}
 
+  - id: RAJUK-STAIRWIDTH-014
+    title: "Stair flight width for A3 (Bidhimala Table-10, 1.15 m)"
+    parameters: [exit_stair_width_m]
+    logic: "exit_stair_width_m >= 1.15"
+    severity: High
+    confidence_basis: "Verbatim Rule 57(d)(1): 'বিভিন্ন ধরনের সিঁড়ির প্রতিটি ফ্লাইটের বাঁধামুক্ত ন্যূনতম প্রশস্ততার পরিমাপ নিম্নবর্ণিত সারণি ১০ অনুযায়ী হইবে' (minimum unobstructed width of each stair flight per Table-10). Table-10 row 1, 'A3 ফ্ল্যাট ও এ্যাপার্টমেন্ট বাড়ি' = ১.১৫ m (page image read at 400 dpi, PDF p.73 / gazette p.13481). Applies to every flight; the value checked is the extracted exit-stair width. [VERIFY]: unsigned. BNBC-STAIRWIDTH-008 sets 1.12 m for the same stair under BNBC Table 4.3.6; expert brief Q9c decides whether both rules stand."
+    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 57(d)(1), Table-10"
+    remediation: "Widen each stair flight to at least 1.15 m clear."
+    verify_flag: true
+    display:
+      kind: compare
+      fix_on: typical_floor
+      headline_fail: "Stair is narrower than the Bidhimala minimum"
+      headline_pass: "Stair width appears to meet the Bidhimala minimum"
+      action: "Widen each stair flight by {gap} to at least {limit}."
+      rows:
+        - {found: exit_stair_width_m, limit: 1.15, direction: min}
+
   - id: RAJUK-CROSSSHEET-013-PARKING
     scope: cross_sheet
     title: "Parking count consistency across all submission sheets"
