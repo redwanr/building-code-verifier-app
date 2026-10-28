@@ -231,10 +231,10 @@ rules:
   - id: RAJUK-PARKING-012
     title: Parking (A3) vs Bidhimala Table-8 slab (uniform flat size)
     parameters: [num_units, avg_flat_area_m2, parking_provided, road_width_m]
-    logic: "road_width_m < 2.5 or ((avg_flat_area_m2 <= 60 or avg_flat_area_m2 > 90 or parking_provided >= num_units / 4) and (avg_flat_area_m2 <= 90 or avg_flat_area_m2 > 140 or parking_provided >= num_units / 2) and (avg_flat_area_m2 <= 140 or avg_flat_area_m2 > 200 or parking_provided >= num_units * 2 / 3) and (avg_flat_area_m2 <= 200 or parking_provided >= num_units * 1.05))"
+    logic: "road_width_m < 2.5 or ((avg_flat_area_m2 <= 60 or avg_flat_area_m2 > 90 or parking_provided >= ceil(num_units / 4)) and (avg_flat_area_m2 <= 90 or avg_flat_area_m2 > 140 or parking_provided >= ceil(num_units / 2)) and (avg_flat_area_m2 <= 140 or avg_flat_area_m2 > 200 or parking_provided >= ceil(num_units * 2 / 3)) and (avg_flat_area_m2 <= 200 or parking_provided >= ceil(num_units * 105 / 100)))"
     severity: Medium
-    confidence_basis: "Slabs verbatim from Table-8 rows 5-9 (>200 m2: 1/flat + 5% guest; 140-200: 2 per 3; 90-140: 1 per 2; 60-90: 1 per 4; <=60 m2: motorcycle only; road 1.8-2.5 m: no parking). [VERIFY]: OCR'd gazette digits; encoded for a uniform flat size — mixed unit sizes need the per-band unit mix; 90/140/200 band edges overlap in the gazette text."
-    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 53(5), Table-8 rows 1, 5-9"
+    confidence_basis: "Slabs verbatim from Table-8 rows 5-9 (>200 m2: 1/flat + 5% guest; 140-200: 2 per 3; 90-140: 1 per 2; 60-90: 1 per 4; <=60 m2: motorcycle only; road 1.8-2.5 m: no parking). Table-8 Note 3 (page image, gazette p.13475): 'পার্কিং স্পেসের চাহিদার ভগ্নাংশের ক্ষেত্রে ১ (একটি) পার্কিং হিসাব করিতে হইবে' — a fractional requirement counts as one space, so each count is rounded up. Ratios are written as integer fractions (105/100, 2/3) so a whole-number requirement is never pushed up by float error. [VERIFY]: OCR'd gazette digits; encoded for a uniform flat size — mixed unit sizes need the per-band unit mix; 90/140/200 band edges overlap in the gazette text."
+    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 53(5), Table-8 rows 1, 5-9 and Note 3"
     remediation: "Recompute required car parking from the unit mix per Table-8 and provide at least that many stalls."
     verify_flag: true
     display:
@@ -244,10 +244,10 @@ rules:
       headline_pass: "Parking appears to meet the Table-8 requirement"
       action: "Provide at least {limit} parking spaces ({gap} more than the sheet shows)."
       rows:
-        - {found: parking_provided, limit: "num_units / 4", direction: min, when: "road_width_m >= 2.5 and avg_flat_area_m2 > 60 and avg_flat_area_m2 <= 90"}
-        - {found: parking_provided, limit: "num_units / 2", direction: min, when: "road_width_m >= 2.5 and avg_flat_area_m2 > 90 and avg_flat_area_m2 <= 140"}
-        - {found: parking_provided, limit: "num_units * 2 / 3", direction: min, when: "road_width_m >= 2.5 and avg_flat_area_m2 > 140 and avg_flat_area_m2 <= 200"}
-        - {found: parking_provided, limit: "num_units * 1.05", direction: min, when: "road_width_m >= 2.5 and avg_flat_area_m2 > 200"}
+        - {found: parking_provided, limit: "ceil(num_units / 4)", direction: min, when: "road_width_m >= 2.5 and avg_flat_area_m2 > 60 and avg_flat_area_m2 <= 90"}
+        - {found: parking_provided, limit: "ceil(num_units / 2)", direction: min, when: "road_width_m >= 2.5 and avg_flat_area_m2 > 90 and avg_flat_area_m2 <= 140"}
+        - {found: parking_provided, limit: "ceil(num_units * 2 / 3)", direction: min, when: "road_width_m >= 2.5 and avg_flat_area_m2 > 140 and avg_flat_area_m2 <= 200"}
+        - {found: parking_provided, limit: "ceil(num_units * 105 / 100)", direction: min, when: "road_width_m >= 2.5 and avg_flat_area_m2 > 200"}
 
   - id: RAJUK-LIFT-013
     title: "Lift count (Bidhimala) — >18 m needs a lift; >33 m/10 storeys needs 2 + stretcher lift"
@@ -401,13 +401,16 @@ lookups:
 
   # Table-8, car parking for A3 at a uniform flat size.
   #
-  # `cars_per_unit` is the multiplier applied to the unit count. Mixed unit
+  # Each slab is an exact ratio: `cars` spaces per `per_units` units. The
+  # required count is ceil(num_units * cars / per_units) — Table-8 Note 3
+  # counts a fraction as one space. Integer fractions keep a whole-number
+  # requirement exact (0.666667 x 9 would round 6 up to 7). Mixed unit
   # sizes need the per-band unit mix, which this flat encoding does not carry
   # (same limitation the rule declares) — a forward consumer given a MIX must
   # emit "cannot evaluate". The gazette's 90/140/200 band edges overlap in the
   # source text; edges here follow the rule's reading.
   parking_by_flat_area:
-    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 53(5), Table-8 rows 1, 5-9"
+    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 53(5), Table-8 rows 1, 5-9 and Note 3"
     rule_id: RAJUK-PARKING-012
     verify_flag: true
     # No car parking is required at all when the front road is under 2.5 m
@@ -415,8 +418,8 @@ lookups:
     no_parking_below_road_width_m: 2.50
     # flat_area_max_m2 inclusive; null = no upper bound.
     slabs:
-      - {flat_area_max_m2: 60,   cars_per_unit: 0,       note: "motorcycle parking only"}
-      - {flat_area_max_m2: 90,   cars_per_unit: 0.25,    note: "1 per 4 units"}
-      - {flat_area_max_m2: 140,  cars_per_unit: 0.5,     note: "1 per 2 units"}
-      - {flat_area_max_m2: 200,  cars_per_unit: 0.666667, note: "2 per 3 units"}
-      - {flat_area_max_m2: null, cars_per_unit: 1.05,    note: "1 per flat + 5% guest"}
+      - {flat_area_max_m2: 60,   cars: 0,   per_units: 1,   note: "motorcycle parking only"}
+      - {flat_area_max_m2: 90,   cars: 1,   per_units: 4,   note: "1 per 4 units"}
+      - {flat_area_max_m2: 140,  cars: 1,   per_units: 2,   note: "1 per 2 units"}
+      - {flat_area_max_m2: 200,  cars: 2,   per_units: 3,   note: "2 per 3 units"}
+      - {flat_area_max_m2: null, cars: 105, per_units: 100, note: "1 per flat + 5% guest"}
