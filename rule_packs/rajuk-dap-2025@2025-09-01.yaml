@@ -343,6 +343,185 @@ rules:
       rows:
         - {found: max_travel_distance_m, limit: 23, direction: max}
 
+  - id: RAJUK-ROOM-018
+    title: "Other habitable rooms at least 5 m2 and 2 m wide (Bidhimala Rule 57(a))"
+    parameters: [room_area_m2, room_width_m]
+    logic: "room_area_m2 >= 5 and room_width_m >= 2"
+    severity: Medium
+    confidence_basis: "Verbatim Rule 57(a)(1) (page image, PDF p.72 / gazette p.13480): 'আবাসিক ভবনের প্রতিটি ইউনিটের ক্ষেত্রে ন্যূনতম ২.৯ মিটার প্রস্থ ও ৯.৫ বর্গমিটার ক্ষেত্রফল বিশিষ্ট অন্তত একটি কক্ষ থাকিতে হইবে এবং অন্যান্য বাসযোগ্য কক্ষসমূহের জন্য সর্বনিম্ন ক্ষেত্রফল ৫ বর্গমিটার এবং ন্যূনতম প্রস্থ ২ মিটার হইতে হইবে' (at least one room 9.5 m2 x 2.9 m per unit; other habitable rooms 5 m2 x 2 m). Checked against the smallest labelled habitable room. BNBC 1.14.2.2 sets 9.5 m2 / 2.9 m for ALL habitable rooms (BNBC-ROOM-007), so a room between 5 and 9.5 m2 passes this rule and fails the BNBC one; the expert decides which governs. The one-room 9.5 m2 clause is not a separate rule: the smallest-room read cannot show it, and BNBC-ROOM-007 already applies 9.5 m2 to every room. [VERIFY]"
+    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 57(a)(1)"
+    remediation: "Enlarge the room to at least 5 m2 and 2 m wide."
+    verify_flag: true
+    display:
+      kind: compare
+      fix_on: typical_floor
+      headline_fail: "A habitable room is below the Bidhimala minimum"
+      headline_pass: "Habitable rooms appear to meet the Bidhimala minimum"
+      rows:
+        - {found: room_area_m2, limit: 5, direction: min, action: "Enlarge the room by {gap} to at least {limit}."}
+        - {found: room_width_m, limit: 2, direction: min, action: "Widen the room by {gap} to at least {limit}."}
+
+  - id: RAJUK-KITCHEN-019
+    title: "Kitchen at least 4 m2 and 1.5 m wide (Bidhimala Rule 57(b))"
+    parameters: [kitchen_area_m2, kitchen_width_m]
+    logic: "kitchen_area_m2 >= 4 and kitchen_width_m >= 1.5"
+    severity: Medium
+    confidence_basis: "Verbatim Rule 57(b)(1) (page image, PDF p.72 / gazette p.13480): 'রান্নাঘরের ন্যূনতম ক্ষেত্রফল ৪ বর্গমিটার এবং প্রস্থ ন্যূনতম ১.৫ মিটার হইবে' (kitchen at least 4 m2 and 1.5 m wide). BNBC 1.14.3.2 states the same 4 m2 / 1.5 m for a kitchen without dining. Checked against the smallest labelled kitchen. [VERIFY]"
+    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 57(b)(1)"
+    remediation: "Enlarge the kitchen to at least 4 m2 and 1.5 m wide."
+    verify_flag: true
+    display:
+      kind: compare
+      fix_on: typical_floor
+      headline_fail: "A kitchen is below the minimum size"
+      headline_pass: "Kitchen size appears to meet the minimum"
+      rows:
+        - {found: kitchen_area_m2, limit: 4, direction: min, action: "Enlarge the kitchen by {gap} to at least {limit}."}
+        - {found: kitchen_width_m, limit: 1.5, direction: min, action: "Widen the kitchen by {gap} to at least {limit}."}
+
+  - id: RAJUK-TOILET-020
+    title: "Toilet at least 1.2 m2 and 1 m wide (Bidhimala Rule 57(c))"
+    parameters: [toilet_area_m2, toilet_width_m]
+    logic: "toilet_area_m2 >= 1.2 and toilet_width_m >= 1"
+    severity: Medium
+    confidence_basis: "Verbatim Rule 57(c)(2) (page image, PDF p.72 / gazette p.13480): 'বেসিন ও ওয়াটার ক্লোজেট সংবলিত টয়লেটের ক্ষেত্রে ন্যূনতম ফ্লোর এরিয়া ১.২ বর্গমিটার এবং ন্যূনতম প্রস্থ ১ মিটার হইবে'; 57(c)(5) (p.13481) gives the same 1.2 m2 / 1 m for a WC only. Those are the smallest of the five toilet types, so they are checked against the smallest labelled toilet. Toilets with a bathing space need more (WC + bath 2.8 m2 / 1 m; basin + WC + bath 3.0 m2 / 1.25 m; basin + bath 1.5 m2 / 1 m), but fixtures are not reliably readable from a label, so those minimums are not encoded. [VERIFY]"
+    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 57(c)(2),(5)"
+    remediation: "Enlarge the toilet to at least 1.2 m2 and 1 m wide (more if it holds a bathing space)."
+    verify_flag: true
+    display:
+      kind: compare
+      fix_on: typical_floor
+      headline_fail: "A toilet is below the smallest allowed size"
+      headline_pass: "Toilet size appears to meet the minimum"
+      rows:
+        - {found: toilet_area_m2, limit: 1.2, direction: min, action: "Enlarge the toilet by {gap} to at least {limit}."}
+        - {found: toilet_width_m, limit: 1, direction: min, action: "Widen the toilet by {gap} to at least {limit}."}
+
+  - id: RAJUK-STAIRGEOM-021
+    title: "Stair riser at most 175 mm, tread at least 225 mm, sum at least 400 mm (Bidhimala Rule 57(d)(2))"
+    parameters: [stair_riser_mm, stair_tread_mm]
+    logic: "stair_riser_mm <= 175 and stair_tread_mm >= 225 and stair_riser_mm + stair_tread_mm >= 400"
+    severity: High
+    confidence_basis: "Verbatim Rule 57(d)(2) (page image, PDF p.74 / gazette p.13482): 'সিঁড়ির রাইজার ও ট্রেডের পরিমাপ এমন হইবে যেন একটি রাইজার ও একটি ট্রেডের যোগফল কমপক্ষে ৪০০ মিলিমিটার হয় এবং রাইজারের সর্বোচ্চ মাপ ১৭৫ মিলিমিটার এবং ট্রেডের সর্বনিম্ন মাপ ২২৫ মিলিমিটার হয়' (riser + tread at least 400 mm; riser at most 175 mm; tread at least 225 mm). [VERIFY]"
+    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 57(d)(2)"
+    remediation: "Redesign the stair so each riser is at most 175 mm, each tread at least 225 mm, and riser + tread at least 400 mm."
+    verify_flag: true
+    display:
+      kind: compare
+      fix_on: sections_elevations
+      headline_fail: "Stair riser or tread is outside the allowed size"
+      headline_pass: "Stair riser and tread appear to be within the limits"
+      rows:
+        - {found: stair_riser_mm, limit: 175, direction: max, action: "Lower the riser by {gap} to at most {limit}."}
+        - {found: stair_tread_mm, limit: 225, direction: min, action: "Deepen the tread by {gap} to at least {limit}."}
+        - {found: "stair_riser_mm + stair_tread_mm", label: "Riser + tread", limit: 400, direction: min, format: stair_riser_mm, action: "Increase riser + tread by {gap} to at least {limit}."}
+
+  - id: RAJUK-STAIRFLIGHT-022
+    title: "At most 20 steps in one stair flight (Bidhimala Rule 57(d)(4))"
+    parameters: [stair_steps_per_flight]
+    logic: "stair_steps_per_flight <= 20"
+    severity: Medium
+    confidence_basis: "Verbatim Rule 57(d)(4) (page image, PDF p.74 / gazette p.13482): 'সিঁড়ির যে কোনো একটি ফ্লাইটে মোট ধাপের সংখ্যা সর্বোচ্চ ২০ এর মধ্যে সীমাবদ্ধ থাকিতে হইবে' (at most 20 steps in any one flight). [VERIFY]"
+    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 57(d)(4)"
+    remediation: "Add a landing so no flight has more than 20 steps."
+    verify_flag: true
+    display:
+      kind: compare
+      fix_on: sections_elevations
+      headline_fail: "A stair flight has more than 20 steps"
+      headline_pass: "Stair flights appear to be within 20 steps"
+      action: "Split the flight with a landing; it has {found} steps, the limit is {limit}."
+      rows:
+        - {found: stair_steps_per_flight, limit: 20, direction: max}
+
+  - id: RAJUK-ROOMHEIGHT-023
+    title: "Habitable room clear height at least 2.75 m (Bidhimala Rule 57(a)(2))"
+    parameters: [room_clear_height_m]
+    logic: "room_clear_height_m >= 2.75"
+    severity: Medium
+    confidence_basis: "Verbatim Rule 57(a)(2) (page image, PDF p.72 / gazette p.13480): 'বসবাসযোগ্য কক্ষের ন্যূনতম উচ্চতা ২.৭৫ মিটার হইবে' (habitable room at least 2.75 m high). The same clause allows 2.15 m under an exposed beam and 2.44 m under a false ceiling in an air-conditioned room; those are not encoded, so a sheet stating only a false-ceiling height may flag. [VERIFY]"
+    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 57(a)(2)"
+    remediation: "Raise the habitable room clear height to at least 2.75 m (2.44 m under a false ceiling in an air-conditioned room)."
+    verify_flag: true
+    display:
+      kind: compare
+      fix_on: sections_elevations
+      headline_fail: "Habitable room height is below the minimum"
+      headline_pass: "Habitable room height appears to meet the minimum"
+      action: "Raise the clear height by {gap} to at least {limit}."
+      rows:
+        - {found: room_clear_height_m, limit: 2.75, direction: min}
+
+  - id: RAJUK-BALCONY-024
+    title: "Front balcony area at most 30% of road-facing width x 1 m (Bidhimala Rule 46, Table-4)"
+    parameters: [front_balcony_area_m2, road_facing_width_m]
+    logic: "front_balcony_area_m2 <= road_facing_width_m * 30 / 100 * 1"
+    severity: Medium
+    confidence_basis: "Verbatim Rule 46(1), Table-4 row 5 (page image, PDF p.51 / gazette p.13459): 'ব্যালকনির ক্ষেত্রফল ইমারতের রাস্তা সংলগ্ন প্রস্থের ৩০% এবং ১ মিটার ব্যালকনির প্রস্থ বিবেচনা করিলে যাহা হয় তাহার অধিক হইতে পারিবে না' (balcony area at most 30% of the road-facing building width x 1 m balcony depth). Conditions: not in the setback, road-facing sides only, not below 3.50 m above ground; those three are not encoded. Checked per floor. RAJUK applied this formula to the Uttara 15/C-1 submission (brief Q7b). [VERIFY]"
+    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 46(1), Table-4 row 5"
+    remediation: "Reduce the road-facing balcony area on each floor to 30% of the road-facing width x 1 m."
+    verify_flag: true
+    display:
+      kind: compare
+      fix_on: typical_floor
+      headline_fail: "Front balcony is larger than allowed"
+      headline_pass: "Front balcony appears to be within the allowed area"
+      action: "Reduce the front balcony on each floor by {gap} to {limit}."
+      rows:
+        - {found: front_balcony_area_m2, limit: "road_facing_width_m * 30 / 100 * 1", direction: max}
+
+  - id: RAJUK-PERMEABLE-025
+    title: "Rainwater absorption area vs Bidhimala Table-3 (plot-size bracket)"
+    parameters: [permeable_area_m2, plot_area_m2]
+    logic: "(plot_area_m2 > 134 or permeable_area_m2 >= plot_area_m2 * 15 / 100) and (plot_area_m2 <= 134 or plot_area_m2 > 201 or permeable_area_m2 >= plot_area_m2 * 16.25 / 100) and (plot_area_m2 <= 201 or plot_area_m2 > 268 or permeable_area_m2 >= plot_area_m2 * 17.5 / 100) and (plot_area_m2 <= 268 or plot_area_m2 > 402 or permeable_area_m2 >= plot_area_m2 * 18.75 / 100) and (plot_area_m2 <= 402 or plot_area_m2 > 670 or permeable_area_m2 >= plot_area_m2 * 20 / 100) and (plot_area_m2 <= 670 or plot_area_m2 > 937 or permeable_area_m2 >= plot_area_m2 * 22.5 / 100) and (plot_area_m2 <= 937 or plot_area_m2 > 1339 or permeable_area_m2 >= plot_area_m2 * 25 / 100) and (plot_area_m2 <= 1339 or plot_area_m2 > 2677 or permeable_area_m2 >= plot_area_m2 * 27.5 / 100) and (plot_area_m2 <= 2677 or permeable_area_m2 >= plot_area_m2 * 30 / 100)"
+    severity: Medium
+    confidence_basis: "Table-3 column 7 (page image, PDF p.48 / gazette p.13456), 'বৃষ্টির পানি শোষণার্থে বাধ্যতামূলক অনাচ্ছাদিত এলাকা': 15 / 16.25 / 17.5 / 18.75 / 20 / 22.5 / 25 / 27.5 / 30% of the land by plot bracket (same edges as RAJUK-MGC-004B). Rule 45(4): that area stays fully permeable, with no foundation or paving above or below ground. The bracket edges carry the katha-edge question of Q8c. [VERIFY]"
+    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 45(1),(4), Table-3 column 7"
+    remediation: "Keep at least the Table-3 share of the plot unpaved and permeable for rainwater, with nothing built above or below it."
+    verify_flag: true
+    display:
+      kind: compare
+      fix_on: layout_far_sheet
+      headline_fail: "Rainwater absorption area is below the minimum for this plot size"
+      headline_pass: "Rainwater absorption area appears to meet the minimum"
+      action: "Add {gap} of permeable area, to at least {limit}."
+      rows:
+        - {found: permeable_area_m2, limit: "plot_area_m2 * 15 / 100", direction: min, when: "plot_area_m2 <= 134"}
+        - {found: permeable_area_m2, limit: "plot_area_m2 * 16.25 / 100", direction: min, when: "plot_area_m2 > 134 and plot_area_m2 <= 201"}
+        - {found: permeable_area_m2, limit: "plot_area_m2 * 17.5 / 100", direction: min, when: "plot_area_m2 > 201 and plot_area_m2 <= 268"}
+        - {found: permeable_area_m2, limit: "plot_area_m2 * 18.75 / 100", direction: min, when: "plot_area_m2 > 268 and plot_area_m2 <= 402"}
+        - {found: permeable_area_m2, limit: "plot_area_m2 * 20 / 100", direction: min, when: "plot_area_m2 > 402 and plot_area_m2 <= 670"}
+        - {found: permeable_area_m2, limit: "plot_area_m2 * 22.5 / 100", direction: min, when: "plot_area_m2 > 670 and plot_area_m2 <= 937"}
+        - {found: permeable_area_m2, limit: "plot_area_m2 * 25 / 100", direction: min, when: "plot_area_m2 > 937 and plot_area_m2 <= 1339"}
+        - {found: permeable_area_m2, limit: "plot_area_m2 * 27.5 / 100", direction: min, when: "plot_area_m2 > 1339 and plot_area_m2 <= 2677"}
+        - {found: permeable_area_m2, limit: "plot_area_m2 * 30 / 100", direction: min, when: "plot_area_m2 > 2677"}
+
+  - id: RAJUK-PAVED-026
+    title: "Paved cover beyond the footprint vs Bidhimala Table-3 (column 6, Note 1)"
+    parameters: [paved_coverage_m2, plot_area_m2]
+    logic: "(plot_area_m2 > 134 or paved_coverage_m2 <= plot_area_m2 * 5 / 100) and (plot_area_m2 <= 134 or plot_area_m2 > 201 or paved_coverage_m2 <= plot_area_m2 * 7.5 / 100) and (plot_area_m2 <= 201 or plot_area_m2 > 268 or paved_coverage_m2 <= plot_area_m2 * 10 / 100) and (plot_area_m2 <= 268 or plot_area_m2 > 402 or paved_coverage_m2 <= plot_area_m2 * 12.5 / 100) and (plot_area_m2 <= 402 or plot_area_m2 > 670 or paved_coverage_m2 <= plot_area_m2 * 15 / 100) and (plot_area_m2 <= 670 or plot_area_m2 > 937 or paved_coverage_m2 <= plot_area_m2 * 20 / 100) and (plot_area_m2 <= 937 or plot_area_m2 > 1339 or paved_coverage_m2 <= plot_area_m2 * 25 / 100) and (plot_area_m2 <= 1339 or plot_area_m2 > 2677 or paved_coverage_m2 <= plot_area_m2 * 27.5 / 100) and (plot_area_m2 <= 2677 or paved_coverage_m2 <= plot_area_m2 * 30 / 100)"
+    severity: Medium
+    confidence_basis: "Table-3 column 6 (page image, PDF p.48 / gazette p.13456): additional ground coverage allowed under the Table-4 exceptions, 15 / 16.25 / 17.5 / 18.75 / 20 / 22.5 / 25 / 27.5 / 30% of the land. Note 1 (gazette p.13457): except affordable housing, columns 4 and 6 together may not exceed 75% of the land. Encoded limit = min(column 6, 75 - column 4) = 5 / 7.5 / 10 / 12.5 / 15 / 20 / 25 / 27.5 / 30%. Table-4 row 1: paved cover beyond MGC may serve only a driveway, parking and a security booth. [VERIFY]"
+    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 45(1), Table-3 column 6 and Note 1; Rule 46, Table-4 row 1"
+    remediation: "Reduce paved cover outside the building to the Table-3 limit for the plot size."
+    verify_flag: true
+    display:
+      kind: compare
+      fix_on: layout_far_sheet
+      headline_fail: "Paved cover outside the building is above the limit for this plot size"
+      headline_pass: "Paved cover appears to be within the limit"
+      action: "Reduce paved cover by {gap} to {limit}."
+      rows:
+        - {found: paved_coverage_m2, limit: "plot_area_m2 * 5 / 100", direction: max, when: "plot_area_m2 <= 134"}
+        - {found: paved_coverage_m2, limit: "plot_area_m2 * 7.5 / 100", direction: max, when: "plot_area_m2 > 134 and plot_area_m2 <= 201"}
+        - {found: paved_coverage_m2, limit: "plot_area_m2 * 10 / 100", direction: max, when: "plot_area_m2 > 201 and plot_area_m2 <= 268"}
+        - {found: paved_coverage_m2, limit: "plot_area_m2 * 12.5 / 100", direction: max, when: "plot_area_m2 > 268 and plot_area_m2 <= 402"}
+        - {found: paved_coverage_m2, limit: "plot_area_m2 * 15 / 100", direction: max, when: "plot_area_m2 > 402 and plot_area_m2 <= 670"}
+        - {found: paved_coverage_m2, limit: "plot_area_m2 * 20 / 100", direction: max, when: "plot_area_m2 > 670 and plot_area_m2 <= 937"}
+        - {found: paved_coverage_m2, limit: "plot_area_m2 * 25 / 100", direction: max, when: "plot_area_m2 > 937 and plot_area_m2 <= 1339"}
+        - {found: paved_coverage_m2, limit: "plot_area_m2 * 27.5 / 100", direction: max, when: "plot_area_m2 > 1339 and plot_area_m2 <= 2677"}
+        - {found: paved_coverage_m2, limit: "plot_area_m2 * 30 / 100", direction: max, when: "plot_area_m2 > 2677"}
+
   - id: RAJUK-CROSSSHEET-013-PARKING
     scope: cross_sheet
     title: "Parking count consistency across all submission sheets"
@@ -442,19 +621,24 @@ lookups:
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 45(1), Table-3"
     rule_id: RAJUK-MGC-004B
     verify_flag: true
-    # plot_max_m2 inclusive; null = no upper bound. Exceptions in the rule's
-    # confidence_basis (extra paved coverage col-6, A6 affordable housing 75%,
-    # road-surrender exclusions) are NOT encoded.
+    # plot_max_m2 inclusive; null = no upper bound. Columns 4, 6 and 7 of
+    # Table-3 (page image, PDF p.48 / gazette p.13456; every row satisfies
+    # col 5 = 100 - col 4 and col 7 = col 5 - col 6, as the header "৭ (৫—৬)"
+    # states, which rules out a ৪/৮ misread). additional_pct = col 6, the
+    # paved/covered extra allowed beyond MGC (RAJUK-PAVED-026, capped by Note 1
+    # at 75% minus col 4). permeable_pct = col 7, the area kept permeable for
+    # rainwater (RAJUK-PERMEABLE-025). A6 affordable housing (75 / 12.5 / 12.5)
+    # and road-surrender exclusions are NOT encoded.
     brackets:
-      - {plot_max_m2: 134,  max_mgc_pct: 70.0}
-      - {plot_max_m2: 201,  max_mgc_pct: 67.5}
-      - {plot_max_m2: 268,  max_mgc_pct: 65.0}
-      - {plot_max_m2: 402,  max_mgc_pct: 62.5}
-      - {plot_max_m2: 670,  max_mgc_pct: 60.0}
-      - {plot_max_m2: 937,  max_mgc_pct: 55.0}
-      - {plot_max_m2: 1339, max_mgc_pct: 50.0}
-      - {plot_max_m2: 2677, max_mgc_pct: 45.0}
-      - {plot_max_m2: null, max_mgc_pct: 40.0}
+      - {plot_max_m2: 134,   max_mgc_pct: 70.0 , additional_pct: 15.0  , permeable_pct: 15.0}
+      - {plot_max_m2: 201,   max_mgc_pct: 67.5 , additional_pct: 16.25 , permeable_pct: 16.25}
+      - {plot_max_m2: 268,   max_mgc_pct: 65.0 , additional_pct: 17.5  , permeable_pct: 17.5}
+      - {plot_max_m2: 402,   max_mgc_pct: 62.5 , additional_pct: 18.75 , permeable_pct: 18.75}
+      - {plot_max_m2: 670,   max_mgc_pct: 60.0 , additional_pct: 20.0  , permeable_pct: 20.0}
+      - {plot_max_m2: 937,   max_mgc_pct: 55.0 , additional_pct: 22.5  , permeable_pct: 22.5}
+      - {plot_max_m2: 1339,  max_mgc_pct: 50.0 , additional_pct: 25.0  , permeable_pct: 25.0}
+      - {plot_max_m2: 2677,  max_mgc_pct: 45.0 , additional_pct: 27.5  , permeable_pct: 27.5}
+      - {plot_max_m2: null,  max_mgc_pct: 40.0 , additional_pct: 30.0  , permeable_pct: 30.0}
 
   # Table-1, minimum setbacks by storey count.
   #
