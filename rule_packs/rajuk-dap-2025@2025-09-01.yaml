@@ -522,6 +522,162 @@ rules:
         - {found: paved_coverage_m2, limit: "plot_area_m2 * 27.5 / 100", direction: max, when: "plot_area_m2 > 1339 and plot_area_m2 <= 2677"}
         - {found: paved_coverage_m2, limit: "plot_area_m2 * 30 / 100", direction: max, when: "plot_area_m2 > 2677"}
 
+  - id: RAJUK-AVIATION-027
+    title: "Red safety light on buildings 45.70 m or taller (Bidhimala Rule 50(3))"
+    parameters: [building_height_m]
+    logic: "building_height_m < 45.7 or param_present('has_aviation_light')"
+    severity: Medium
+    confidence_basis: "Verbatim Rule 50(3) (page image, PDF p.61 / gazette p.13469): 'কোনো ইমারত ৪৫.৭০ মিটার বা তদূর্ধ্ব উচ্চতার হইলে ইমারতের শীর্ষে লাল নিরাপত্তা বাতি স্থাপন করিতে হইবে' (a building 45.70 m or taller needs a red safety light on top). [VERIFY]"
+    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 50(3)"
+    remediation: "Show a red safety (aviation obstruction) light at the top of the building."
+    verify_flag: true
+    display:
+      kind: presence
+      fix_on: sections_elevations
+      headline_fail: "No red safety light is shown on a building this tall"
+      headline_pass: "Red safety light appears to be shown, or is not needed at this height"
+      action: "Show on the elevations or roof plan: {missing}."
+      rows:
+        - {require: has_aviation_light, label: "Red safety light at the top", when: "building_height_m >= 45.7"}
+
+  - id: RAJUK-RAMP-028
+    title: "Car ramp no steeper than 1:8 (Bidhimala Rule 53(8))"
+    parameters: [ramp_slope_1_in_n]
+    logic: "ramp_slope_1_in_n >= 8"
+    severity: Medium
+    confidence_basis: "Verbatim Rule 53(8) (page image, PDF p.68 / gazette p.13476): 'পার্কিং স্থানে প্রবেশ বা নির্গমনের র‍্যাম্পব্যবহারের ক্ষেত্রে সর্বোচ্চ ঢাল ১:৮ হইবে এবং র‍্যাম্প আরম্ভের পূর্বে ৪.২৫ মিটার দীর্ঘ আনুভূমিক পথ থাকিতে হইবে, তবে ০.৭৫ মিটার পর্যন্ত প্রারম্ভিক উচ্চতায় উঠা বা নামিবার জন্য উক্ত শর্ত প্রযোজ্য হইবে না' (parking ramp at most 1:8, with a 4.25 m level run before it; a rise of up to 0.75 m is exempt). Read as N in a slope labelled 1:N. The 4.25 m level run and the 0.75 m exemption are not encoded. [VERIFY]"
+    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 53(8)"
+    remediation: "Lengthen the ramp so its slope is 1:8 or gentler."
+    verify_flag: true
+    display:
+      kind: compare
+      fix_on: ground_floor
+      headline_fail: "Car ramp is steeper than 1:8"
+      headline_pass: "Car ramp slope appears to be within 1:8"
+      action: "Make the ramp at least 1:{limit}; the sheet shows 1:{found}."
+      rows:
+        - {found: ramp_slope_1_in_n, limit: 8, direction: min}
+
+  - id: RAJUK-RAMPWIDTH-029
+    title: "Car ramp at least 3 m wide (Bidhimala Rule 53(10))"
+    parameters: [ramp_width_m]
+    logic: "ramp_width_m >= 3"
+    severity: Medium
+    confidence_basis: "Verbatim Rule 53(10) (page image, PDF p.68 / gazette p.13476): 'একমুখী গাড়ি চলাচলের র‍্যাম্পের ক্ষেত্রে ন্যূনতম প্রস্থ ৩ মিটার এবং উভয়মুখী গাড়ী চলাচলের র‍্যাম্পের ক্ষেত্রে ন্যূনতম প্রস্থ সাধারণ গাড়ীর ক্ষেত্রে ৪.২৫ মিটার এবং অন্যান্য ক্ষেত্রে ৬ মিটার হইতে হইবে' (one-way ramp at least 3 m; two-way 4.25 m for ordinary cars, 6 m otherwise). Only the 3 m floor is encoded, because one-way vs two-way is not reliably readable; a two-way ramp between 3 and 4.25 m passes here. [VERIFY]"
+    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 53(10)"
+    remediation: "Widen the ramp to at least 3 m (4.25 m if two-way for ordinary cars)."
+    verify_flag: true
+    display:
+      kind: compare
+      fix_on: ground_floor
+      headline_fail: "Car ramp is narrower than 3 m"
+      headline_pass: "Car ramp width appears to meet the one-way minimum"
+      action: "Widen the ramp by {gap} to at least {limit} (4.25 m if two-way)."
+      rows:
+        - {found: ramp_width_m, limit: 3, direction: min}
+
+  - id: RAJUK-PARKHEIGHT-030
+    title: "Parking and ramp clear height at least 2.25 m (Bidhimala Rule 53(12))"
+    parameters: [parking_clear_height_m]
+    logic: "parking_clear_height_m >= 2.25"
+    severity: Medium
+    confidence_basis: "Verbatim Rule 53(12) (page image, PDF p.68 / gazette p.13476): 'পার্কিং স্থান এবং র‍্যাম্পের বাঁধামুক্ত উচ্চতা কমপক্ষে ২.২৫ মিটার হইতে হইবে' (parking space and ramp clear height at least 2.25 m). [VERIFY]"
+    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 53(12)"
+    remediation: "Raise the parking floor clear height (below beams) to at least 2.25 m."
+    verify_flag: true
+    display:
+      kind: compare
+      fix_on: sections_elevations
+      headline_fail: "Parking clear height is below 2.25 m"
+      headline_pass: "Parking clear height appears to meet the minimum"
+      action: "Raise the parking clear height by {gap} to at least {limit}."
+      rows:
+        - {found: parking_clear_height_m, limit: 2.25, direction: min}
+
+  - id: RAJUK-TREE-031
+    title: "Tree planting on at least 10% of plots over 1340 m2 (Bidhimala Rule 55(1))"
+    parameters: [plot_area_m2, tree_planting_area_m2]
+    applies_if:
+      params: [plot_area_m2]
+      when: "plot_area_m2 > 1340"
+      not_applicable: "Tree planting is required only on plots over 1340 m² (20 katha)."
+    logic: "plot_area_m2 <= 1340 or tree_planting_area_m2 >= plot_area_m2 * 10 / 100"
+    severity: Low
+    confidence_basis: "Verbatim Rule 55(1) (page image, PDF p.71 / gazette p.13479): 'প্লটের পরিমাণ ১৩৪০ বর্গ মিটার (২০ কাঠা) এর অধিক হইলে প্লটের ন্যূনতম ১০% জায়গায় আবশ্যিকভাবে বৃক্ষরোপণ করিতে হইবে' (plot over 1340 m2 / 20 katha: tree planting on at least 10% of the plot). Rule 55(3) prints the same 1340 m2 as '১৪ কাঠা'; 1340 m2 is about 20 katha, so 55(1) is followed (gazette defect, brief Q). [VERIFY]"
+    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 55(1)"
+    remediation: "Set aside at least 10% of the plot for tree planting (in up to two parts, none smaller than one third)."
+    verify_flag: true
+    display:
+      kind: compare
+      fix_on: layout_far_sheet
+      headline_fail: "Tree planting area is below 10% of the plot"
+      headline_pass: "Tree planting area appears to meet 10% of the plot"
+      action: "Add {gap} of tree planting area, to at least {limit}."
+      rows:
+        - {found: tree_planting_area_m2, limit: "plot_area_m2 * 10 / 100", direction: min, when: "plot_area_m2 > 1340"}
+
+  - id: RAJUK-COMMUNITY-032
+    title: "Community space at least 5% of FAR area above 3000 m2 (Bidhimala Rule 57(f)(1))"
+    parameters: [total_floor_area_m2, community_space_m2]
+    applies_if:
+      params: [total_floor_area_m2]
+      when: "total_floor_area_m2 > 3000"
+      not_applicable: "Community space is required only when the FAR-included floor area is over 3000 m²."
+    logic: "total_floor_area_m2 <= 3000 or community_space_m2 >= total_floor_area_m2 * 5 / 100"
+    severity: Low
+    confidence_basis: "Verbatim Rule 57(f)(1) (page image, PDF p.76 / gazette p.13484): 'FAR এর আওতাভুক্ত সর্বমোট ৩০০০ (তিন হাজার) বর্গমিটারের অধিক ক্ষেত্রফলবিশিষ্ট আবাসিক ভবনে বসবাসকারীদের ব্যবহারের জন্য FAR-ভুক্ত মেঝের আয়তনের ন্যূনতম ৫% স্থান ... কমিউনিটি স্পেস হিসাবে রাখিতে হইবে' (residential building with more than 3000 m2 of FAR-included floor: at least 5% of the FAR-included floor as community space). [VERIFY]"
+    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 57(f)(1)"
+    remediation: "Provide community space of at least 5% of the FAR-included floor area."
+    verify_flag: true
+    display:
+      kind: compare
+      fix_on: ground_floor
+      headline_fail: "Community space is below 5% of the FAR area"
+      headline_pass: "Community space appears to meet 5% of the FAR area"
+      action: "Add {gap} of community space, to at least {limit}."
+      rows:
+        - {found: community_space_m2, limit: "total_floor_area_m2 * 5 / 100", direction: min, when: "total_floor_area_m2 > 3000"}
+
+  - id: RAJUK-PLAY-033
+    title: "Play area at least 10% of land of 1300 m2 or more (Bidhimala Rule 57(f)(2))"
+    parameters: [plot_area_m2, play_area_m2]
+    applies_if:
+      params: [plot_area_m2]
+      when: "plot_area_m2 >= 1300"
+      not_applicable: "A play area is required only on residential land of 1300 m² or more."
+    logic: "plot_area_m2 < 1300 or play_area_m2 >= plot_area_m2 * 10 / 100"
+    severity: Low
+    confidence_basis: "Verbatim Rule 57(f)(2) (page image, PDF p.77 / gazette p.13485): 'ব্লক ভিত্তিক উন্নয়ন ব্যতীত ১৩০০ (এক হাজার তিনশত) বর্গমিটার বা তদূর্ধ্ব পরিমাণের আবাসিক জমিতে এ্যাপার্টমেন্ট নির্মাণ করিতে চাহিলে সম্পূর্ণ জমির অন্তত ১০% ... খেলার জায়গা হিসাবে ... রাখিতে হইবে' (apartments on residential land of 1300 m2 or more, other than block-based development: at least 10% of the land as a play area; setback space may count). Block-based development is not readable from a sheet and is not exempted here. [VERIFY]"
+    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 57(f)(2)"
+    remediation: "Set aside at least 10% of the land as a play area for residents (half may be covered, unenclosed)."
+    verify_flag: true
+    display:
+      kind: compare
+      fix_on: layout_far_sheet
+      headline_fail: "Play area is below 10% of the land"
+      headline_pass: "Play area appears to meet 10% of the land"
+      action: "Add {gap} of play area, to at least {limit}."
+      rows:
+        - {found: play_area_m2, limit: "plot_area_m2 * 10 / 100", direction: min, when: "plot_area_m2 >= 1300"}
+
+  - id: RAJUK-BOUNDARYWALL-034
+    title: "Boundary wall at most 3 m, solid part at most 1.75 m (Bidhimala Rule 61(b)(1))"
+    parameters: [boundary_wall_height_m, boundary_wall_solid_height_m]
+    logic: "boundary_wall_height_m <= 3 and boundary_wall_solid_height_m <= 1.75"
+    severity: Low
+    confidence_basis: "Verbatim Rule 61(b)(1) (page image, PDF p.81 / gazette p.13489): 'আবাসিক ভবনের ক্ষেত্রে প্লটের সকল পার্শ্বস্থ সীমানা দেয়ালের উচ্চতা ৩ (তিন) মিটারের অধিক হইতে পারিবে না যাহা সংলগ্ন রাস্তার সর্বোচ্চ বিন্দু হইতে পরিমাপকৃত হইবে এবং সর্বোচ্চ ১.৭৫ মিটার উচ্চতা পর্যন্ত নিরেট ও বাকি অংশ বায়ু চলাচলের জন্য জালি অথবা গ্রিল করা যাইবে' (residential boundary walls at most 3 m from the highest point of the adjoining road; solid up to 1.75 m, the rest lattice or grille). [VERIFY]"
+    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 61(b)(1)"
+    remediation: "Keep the boundary wall to 3 m overall, solid only up to 1.75 m, with lattice or grille above."
+    verify_flag: true
+    display:
+      kind: compare
+      fix_on: other
+      headline_fail: "Boundary wall is higher than allowed"
+      headline_pass: "Boundary wall height appears to be within the limits"
+      rows:
+        - {found: boundary_wall_height_m, limit: 3, direction: max, action: "Lower the boundary wall by {gap} to at most {limit}."}
+        - {found: boundary_wall_solid_height_m, limit: 1.75, direction: max, action: "Lower the solid part by {gap} to at most {limit}; use lattice or grille above."}
+
   - id: RAJUK-CROSSSHEET-013-PARKING
     scope: cross_sheet
     title: "Parking count consistency across all submission sheets"
@@ -586,7 +742,7 @@ lookups:
   # allows DAP incentives to exceed the road-band FAR up to the maximum FAR
   # (Q8b); a forward consumer MUST surface that caveat.
   far_by_road_width:
-    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 47(5), Table-5 (A3 rows 1-3) + Rule 47(3); same table as DAP Appendix 3.5 as replaced by S.R.O. 468-Ain/2025"
+    citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 47(5), Table-5 (A3 rows 1-3) + Rule 47(6) + Rule 47(3); same table as DAP Appendix 3.5 as replaced by S.R.O. 468-Ain/2025"
     rule_id: RAJUK-FAR-ROADBAND-011
     verify_flag: true
     sub_class: A3
