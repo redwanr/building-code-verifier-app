@@ -4,6 +4,9 @@
 # interpretation question, or presence-read reliability — see confidence_basis).
 # Every numeric value below traces to a verbatim BNBC-2020 quote in
 # docs/new_features/nirman-traceability.md (source: docs/new_features/bnbc-2020-text.txt).
+# `*_bn` fields are Bengali display text for the language toggle: drafted by
+# Claude, approved by the founder at merge. They describe the check and never
+# feed `logic`.
 jurisdiction: bnbc-2020
 effective_date: "2020-01-01"
 source: BNBC-2020
@@ -11,37 +14,47 @@ source: BNBC-2020
 rules:
   - id: BNBC-EGRESS-001
     title: Minimum two means of egress (high-rise screening)
+    title_bn: "কমপক্ষে দুটি নির্গমন পথ (উঁচু ভবনের প্রাথমিক বাছাই)"
     parameters: [num_storeys, building_height_m, num_exit_stairs]
     logic: "num_exit_stairs >= 2 if (building_height_m > 20 or num_storeys > 6) else True"
     severity: Critical
     confidence_basis: "Screening trigger (>20 m / >6 storeys) [VERIFY] — intentionally stricter than the code letter. BNBC ties exit count to occupant load (<50 -> 1 exit; 50-500 -> 2), Sec 3.14.2; see BNBC-EGRESS-001B for the sourced occupant-load check."
     citation: "BNBC-2020 Part 4 Ch 3 Sec 3.14 (Number of Exits) + Table 4.3.1"
     remediation: "Provide a second independent, fire-separated exit stair."
+    remediation_bn: "আরেকটি আলাদা, ফায়ার-সেপারেটেড এক্সিট সিঁড়ি দিন।"
     verify_flag: true
     display:
       kind: compare
       fix_on: typical_floor
       headline_fail: "A building this tall needs two exit stairs"
+      headline_fail_bn: "এত উঁচু ভবনে দুটি এক্সিট সিঁড়ি লাগবে"
       headline_pass: "Exit stair count appears to be enough for the building height"
+      headline_pass_bn: "ভবনের উচ্চতা অনুযায়ী এক্সিট সিঁড়ির সংখ্যা যথেষ্ট বলে মনে হচ্ছে"
       action: "Show {limit} independent, fire-separated exit stairs; the sheet shows {found}."
+      action_bn: "{limit}টি আলাদা, ফায়ার-সেপারেটেড এক্সিট সিঁড়ি দেখান; শিটে আছে {found}টি।"
       rows:
         - {found: num_exit_stairs, limit: 2, direction: min, when: "building_height_m > 20 or num_storeys > 6"}
 
   - id: BNBC-EGRESS-001B
     title: Exit count vs occupant load (residential 18 m2/person)
+    title_bn: "অকুপ্যান্ট লোড অনুযায়ী এক্সিটের সংখ্যা (আবাসিক: জনপ্রতি 18 m²)"
     parameters: [floor_area_m2, num_exit_stairs]
     logic: "(floor_area_m2 / 18 < 50 or num_exit_stairs >= 2) and (floor_area_m2 / 18 <= 500 or num_exit_stairs >= 3) and (floor_area_m2 / 18 <= 1000 or num_exit_stairs >= 4)"
     severity: Critical
     confidence_basis: "Exit bands and 18 m2 gross/person occupant load verbatim from BNBC (Sec 3.14.2, Table 4.3.1); [VERIFY] interpretation — code applies bands per 'space', encoded here per typical floor."
     citation: "BNBC-2020 Part 4 Ch 3 Sec 3.14.2 (exit count by occupant load) + Table 4.3.1 (Residential: 18 gross)"
     remediation: "Add exits/exit stairs until the count meets the occupant-load band for the floor area served."
+    remediation_bn: "ফ্লোর এরিয়ার অকুপ্যান্ট লোড অনুযায়ী প্রয়োজনীয় সংখ্যা না হওয়া পর্যন্ত এক্সিট বা এক্সিট সিঁড়ি বাড়ান।"
     verify_flag: true
     display:
       kind: compare
       fix_on: typical_floor
       headline_fail: "Not enough exit stairs for the people on this floor"
+      headline_fail_bn: "এই তলার লোকসংখ্যার তুলনায় এক্সিট সিঁড়ি কম"
       headline_pass: "Exit stair count appears to be enough for the floor area"
+      headline_pass_bn: "ফ্লোর এরিয়া অনুযায়ী এক্সিট সিঁড়ির সংখ্যা যথেষ্ট বলে মনে হচ্ছে"
       action: "Show at least {limit} exit stairs for this floor area; the sheet shows {found}."
+      action_bn: "এই ফ্লোর এরিয়ার জন্য কমপক্ষে {limit}টি এক্সিট সিঁড়ি দেখান; শিটে আছে {found}টি।"
       rows:
         - {found: num_exit_stairs, limit: 2, direction: min, when: "floor_area_m2 / 18 >= 50"}
         - {found: num_exit_stairs, limit: 3, direction: min, when: "floor_area_m2 / 18 > 500"}
@@ -49,112 +62,141 @@ rules:
 
   - id: BNBC-FIRE-002
     title: High-rise fire provisions for A-3 (presence check)
+    title_bn: "A-3 উঁচু ভবনের অগ্নিনিরাপত্তা ব্যবস্থা (দেখানো আছে কি না যাচাই)"
     parameters: [building_height_m]
     logic: "(param_present('has_fire_alarm') and param_present('has_fire_hydrant_standpipe') and param_present('has_fire_rated_stair_enclosure') and param_present('has_firefighting_lift')) if building_height_m > 20 else True"
     severity: Critical
     confidence_basis: "Provision list sourced (Sec 5.3.2(b): manual alarm + fixed hydrant in fire-stair landings/lift lobby; Sec 3.13 smoke-proof enclosure; Part 8 Sec 4.2.2.3 fireman's lift). Screening trigger 20 m [VERIFY] — code exempts A3 up to 33 m (Sec 5.3.2(a)); expert to confirm governing height."
     citation: "BNBC-2020 Part 4 Ch 5 Sec 5.3.2 (Occupancy A3) + Part 4 Ch 3 Sec 3.13 + Part 8 Ch 4 Sec 4.2.2.3"
     remediation: "Add manual fire alarm + fixed hydrant at fire-stair landings/lift lobby; fire-rate the stair enclosure; provide a fire-fighting lift."
+    remediation_bn: "ফায়ার সিঁড়ির ল্যান্ডিং/লিফট লবিতে ম্যানুয়াল ফায়ার অ্যালার্ম ও স্থায়ী হাইড্রেন্ট দিন; সিঁড়ির ঘের ফায়ার-রেটেড করুন; একটি ফায়ার লিফট দিন।"
     verify_flag: true
     display:
       kind: presence
       fix_on: typical_floor
       headline_fail: "Fire safety items are not shown for this building height"
+      headline_fail_bn: "এই উচ্চতার ভবনের অগ্নিনিরাপত্তা ব্যবস্থা দেখানো নেই"
       headline_pass: "Fire safety items appear to be shown"
+      headline_pass_bn: "অগ্নিনিরাপত্তা ব্যবস্থা দেখানো আছে বলে মনে হচ্ছে"
       action: "Show on the plans: {missing}."
+      action_bn: "প্ল্যানে দেখান: {missing}।"
       rows:
-        - {require: has_fire_alarm, label: "Manual fire alarm", when: "building_height_m > 20"}
-        - {require: has_fire_hydrant_standpipe, label: "Fire hydrant at the stair landings", when: "building_height_m > 20"}
-        - {require: has_fire_rated_stair_enclosure, label: "Fire-rated stair enclosure", when: "building_height_m > 20"}
-        - {require: has_firefighting_lift, label: "Fire-fighting lift", when: "building_height_m > 20"}
+        - {require: has_fire_alarm, label: "Manual fire alarm", label_bn: "ম্যানুয়াল ফায়ার অ্যালার্ম", when: "building_height_m > 20"}
+        - {require: has_fire_hydrant_standpipe, label: "Fire hydrant at the stair landings", label_bn: "সিঁড়ির ল্যান্ডিংয়ে ফায়ার হাইড্রেন্ট", when: "building_height_m > 20"}
+        - {require: has_fire_rated_stair_enclosure, label: "Fire-rated stair enclosure", label_bn: "অগ্নিনিরাপদ সিঁড়ি", when: "building_height_m > 20"}
+        - {require: has_firefighting_lift, label: "Fire-fighting lift", label_bn: "ফায়ার লিফট", when: "building_height_m > 20"}
 
   - id: BNBC-ROOM-007
     title: Minimum habitable room area/width (9.5 m2 / 2.9 m)
+    title_bn: "বসবাসযোগ্য কক্ষের ন্যূনতম ক্ষেত্রফল/প্রস্থ (9.5 m² / 2.9 m)"
     parameters: [room_area_m2, room_width_m]
     logic: "room_area_m2 >= 9.5 and room_width_m >= 2.9"
     severity: Medium
     confidence_basis: "Primary-sourced firm: BNBC Part 3 Sec 1.14.2.2 — habitable rooms >= 9.5 m2 net, min width 2.9 m."
     citation: "BNBC-2020 Part 3 Ch 1 Sec 1.14.2.2 (Room sizes)"
     remediation: "Enlarge the habitable room to at least 9.5 m2 net floor area and 2.9 m width."
+    remediation_bn: "বসবাসযোগ্য কক্ষের নিট ফ্লোর এরিয়া কমপক্ষে 9.5 m² ও প্রস্থ কমপক্ষে 2.9 m করুন।"
     verify_flag: false
     display:
       kind: compare
       fix_on: typical_floor
       headline_fail: "A habitable room is smaller than the minimum"
+      headline_fail_bn: "একটি বসবাসযোগ্য কক্ষ ন্যূনতম মাপের চেয়ে ছোট"
       headline_pass: "Habitable room size appears to be within the minimum"
+      headline_pass_bn: "বসবাসযোগ্য কক্ষের মাপ ন্যূনতম সীমা পূরণ করছে বলে মনে হচ্ছে"
       rows:
-        - {found: room_area_m2, limit: 9.5, direction: min, action: "Enlarge the room by {gap} to at least {limit}."}
-        - {found: room_width_m, limit: 2.9, direction: min, action: "Widen the room by {gap} to at least {limit}."}
+        - {found: room_area_m2, limit: 9.5, direction: min, action: "Enlarge the room by {gap} to at least {limit}.", action_bn: "কক্ষটি {gap} বাড়িয়ে কমপক্ষে {limit} করুন।"}
+        - {found: room_width_m, limit: 2.9, direction: min, action: "Widen the room by {gap} to at least {limit}.", action_bn: "কক্ষের প্রস্থ {gap} বাড়িয়ে কমপক্ষে {limit} করুন।"}
 
   - id: BNBC-STAIRWIDTH-008
     title: Minimum exit-stair width for A3 (1120 mm)
+    title_bn: "A3-এর এক্সিট সিঁড়ির ন্যূনতম প্রস্থ (1120 mm)"
     parameters: [exit_stair_width_m]
     logic: "exit_stair_width_m >= 1.12"
     severity: High
     confidence_basis: "Primary-sourced firm: Table 4.3.6 — minimum width of each stairway for A3/A4/A5 = 1120 mm."
     citation: "BNBC-2020 Part 4 Ch 3 Table 4.3.6 (Minimum Width of Stairways in Egress System)"
     remediation: "Widen the exit stair to at least 1120 mm clear."
+    remediation_bn: "এক্সিট সিঁড়ির বাধামুক্ত প্রস্থ কমপক্ষে 1120 mm করুন।"
     verify_flag: false
     display:
       kind: compare
       fix_on: typical_floor
       headline_fail: "Exit stair is narrower than the minimum"
+      headline_fail_bn: "এক্সিট সিঁড়ির প্রস্থ ন্যূনতমের চেয়ে কম"
       headline_pass: "Exit stair width appears to be enough"
+      headline_pass_bn: "এক্সিট সিঁড়ির প্রস্থ যথেষ্ট বলে মনে হচ্ছে"
       action: "Widen the exit stair by {gap} to at least {limit}."
+      action_bn: "এক্সিট সিঁড়ির প্রস্থ {gap} বাড়িয়ে কমপক্ষে {limit} করুন।"
       rows:
         - {found: exit_stair_width_m, limit: 1.12, direction: min}
 
   - id: BNBC-LIFT-009
     title: Lift provision (>6 storeys or >20 m)
+    title_bn: "লিফটের ব্যবস্থা (6 তলার বেশি বা 20 m-এর বেশি)"
     parameters: [num_storeys, building_height_m, num_lifts]
     logic: "(num_lifts >= 1) if (building_height_m > 20 or num_storeys > 6) else True"
     severity: High
     confidence_basis: "Primary-sourced firm: Part 8 Sec 4.2.1.1 — 'Lifts shall be provided in buildings more than six storeys or 20 m in height.'"
     citation: "BNBC-2020 Part 8 Ch 4 Sec 4.2.1.1 (Essential Requirements for Lifts)"
     remediation: "Provide at least one passenger lift for the building height/storey count."
+    remediation_bn: "ভবনের উচ্চতা/তলার সংখ্যা অনুযায়ী কমপক্ষে একটি প্যাসেঞ্জার লিফট দিন।"
     verify_flag: false
     display:
       kind: compare
       fix_on: typical_floor
       headline_fail: "No lift is shown for a building this tall"
+      headline_fail_bn: "এত উঁচু ভবনে কোনো লিফট দেখানো নেই"
       headline_pass: "Lift count appears to be enough for the building height"
+      headline_pass_bn: "ভবনের উচ্চতা অনুযায়ী লিফটের সংখ্যা যথেষ্ট বলে মনে হচ্ছে"
       action: "Show at least {limit} passenger lift; the sheet shows {found}."
+      action_bn: "কমপক্ষে {limit}টি প্যাসেঞ্জার লিফট দেখান; শিটে আছে {found}টি।"
       rows:
         - {found: num_lifts, limit: 1, direction: min, when: "building_height_m > 20 or num_storeys > 6"}
 
   - id: BNBC-FIRELIFT-010
     title: Fireman's lift for buildings 15 m or higher
+    title_bn: "15 m বা তার বেশি উঁচু ভবনে ফায়ার লিফট"
     parameters: [building_height_m]
     logic: "param_present('has_firefighting_lift') if building_height_m >= 15 else True"
     severity: High
     confidence_basis: "Trigger primary-sourced firm (Part 8 Sec 4.2.2.3: >=15 m -> at least one fireman's lift). [VERIFY] presence-read reliability — absence on the sheet may be a notation gap, not a design gap."
     citation: "BNBC-2020 Part 8 Ch 4 Sec 4.2.2.3 (Fireman's lift) + Part 4 Ch 2 Sec 2.11 (Fire Lifts)"
     remediation: "Designate at least one lift as a fireman's lift (>=1.44 m2 car, 8-person/544 kg, 2-hr rated landing doors, ground-to-top within 60 s)."
+    remediation_bn: "কমপক্ষে একটি লিফটকে ফায়ার লিফট হিসেবে নির্ধারণ করুন (কার >=1.44 m², 8 জন/544 kg, 2 ঘণ্টা ফায়ার-রেটেড ল্যান্ডিং দরজা, নিচতলা থেকে সর্বোচ্চ তলা 60 সেকেন্ডের মধ্যে)।"
     verify_flag: true
     display:
       kind: presence
       fix_on: typical_floor
       headline_fail: "A fire-fighting lift is not shown"
+      headline_fail_bn: "ফায়ার লিফট দেখানো নেই"
       headline_pass: "A fire-fighting lift appears to be shown"
+      headline_pass_bn: "ফায়ার লিফট দেখানো আছে বলে মনে হচ্ছে"
       action: "Mark one lift as the fire-fighting lift on the plans."
+      action_bn: "প্ল্যানে একটি লিফটকে ফায়ার লিফট হিসেবে চিহ্নিত করুন।"
       rows:
-        - {require: has_firefighting_lift, label: "Fire-fighting lift", when: "building_height_m >= 15"}
+        - {require: has_firefighting_lift, label: "Fire-fighting lift", label_bn: "ফায়ার লিফট", when: "building_height_m >= 15"}
 
   - id: BNBC-TRAVEL-011
     title: Maximum travel distance (A3 45 m / 60 m sprinklered)
+    title_bn: "এক্সিট পর্যন্ত সর্বোচ্চ দূরত্ব (A3: 45 m / স্প্রিংকলার থাকলে 60 m)"
     parameters: [max_travel_distance_m]
     logic: "max_travel_distance_m <= 60 if param_present('has_sprinkler_system') else max_travel_distance_m <= 45"
     severity: High
     confidence_basis: "Limits primary-sourced firm (Table 4.3.8, A3 row: 45 m unsprinklered / 60 m sprinklered). [VERIFY] input reliability — value must be stated on the egress plan/notes; the engine never measures geometry."
     citation: "BNBC-2020 Part 4 Ch 3 Sec 3.15.2 + Table 4.3.8 (Maximum Travel Path, A3)"
     remediation: "Rearrange exits or add a sprinkler system so the maximum travel path meets Table 4.3.8."
+    remediation_bn: "এক্সিটের অবস্থান বদলান বা স্প্রিংকলার সিস্টেম যোগ করুন, যাতে সর্বোচ্চ দূরত্ব Table 4.3.8 পূরণ করে।"
     verify_flag: true
     display:
       kind: compare
       fix_on: typical_floor
       headline_fail: "Travel distance to an exit is longer than allowed"
+      headline_fail_bn: "এক্সিট পর্যন্ত দূরত্ব অনুমোদিত সীমার চেয়ে বেশি"
       headline_pass: "Travel distance to an exit appears to be within the limit"
+      headline_pass_bn: "এক্সিট পর্যন্ত দূরত্ব সীমার মধ্যে আছে বলে মনে হচ্ছে"
       action: "Shorten the travel path by {gap} to {limit}, or add exits."
+      action_bn: "এক্সিট পর্যন্ত পথ {gap} কমিয়ে {limit} করুন, অথবা এক্সিট বাড়ান।"
       rows:
         - {found: max_travel_distance_m, limit: 60, direction: max, when: "param_present('has_sprinkler_system')"}
         - {found: max_travel_distance_m, limit: 45, direction: max, when: "param_present('has_sprinkler_system') == False"}
