@@ -8,6 +8,9 @@
 # User-supplied values (permissible_far, allowable_mgc_pct, required setbacks,
 # parking_required) stay ward/plan-specific at the confirmation gate; the *B /
 # numbered sourced rules cross-check against the gazette tables directly.
+# `*_bn` fields are Bengali display text for the language toggle: drafted by
+# Claude, approved by the founder at merge. They describe the check and never
+# feed `logic`.
 jurisdiction: rajuk-dap-2025
 effective_date: "2025-09-01"
 source: RAJUK-DAP/Bidhimala
@@ -15,75 +18,95 @@ source: RAJUK-DAP/Bidhimala
 rules:
   - id: RAJUK-FAR-003-LIMIT
     title: Claimed FAR within permissible FAR
+    title_bn: "শিটে লেখা FAR অনুমোদনযোগ্য FAR-এর মধ্যে"
     parameters: [claimed_far, permissible_far]
     logic: "claimed_far <= permissible_far"
     severity: High
     confidence_basis: "Principle sourced (Bidhimala 2025 Rule 47(3): base FAR = smaller of area-based and road-based FAR, binding); permissible value is plot-specific (DAP density block + incentives) and user-supplied [VERIFY]"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 47 + DAP 2022-2035 density-block FAR"
     remediation: "Verify claimed FAR against the plot's DAP density-block FAR and road-based FAR (Rule 47, Table-5)."
+    remediation_bn: "শিটে লেখা FAR-কে প্লটের DAP ডেনসিটি ব্লকের FAR ও রাস্তাভিত্তিক FAR-এর সঙ্গে মিলিয়ে দেখুন (বিধি 47, Table-5)।"
     verify_flag: true
     display:
       kind: compare
       fix_on: layout_far_sheet
       headline_fail: "FAR is above the allowed limit"
+      headline_fail_bn: "FAR অনুমোদিত সীমার চেয়ে বেশি"
       headline_pass: "FAR appears to be within the allowed limit"
+      headline_pass_bn: "FAR অনুমোদিত সীমার মধ্যে আছে বলে মনে হচ্ছে"
       action: "Reduce FAR by {gap} to {limit}[[ (about {gap_area} of FAR-included floor area)]]."
+      action_bn: "FAR {gap} কমিয়ে {limit} করুন[[ (FAR-ভুক্ত ফ্লোর এরিয়া প্রায় {gap_area} কমবে)]]।"
       rows:
         - {found: claimed_far, limit: permissible_far, direction: max}
 
   - id: RAJUK-FAR-003-CONSISTENCY
     title: Claimed FAR consistent with floor-area / plot-area math
+    title_bn: "শিটে লেখা FAR ফ্লোর এরিয়া / প্লট এরিয়ার হিসাবের সঙ্গে মেলে"
     parameters: [claimed_far, total_floor_area_m2, plot_area_m2]
     logic: "consistency([claimed_far, total_floor_area_m2 / plot_area_m2])"
     severity: High
     confidence_basis: "Internal arithmetic consistency per the gazette's own formula (Bidhimala 2025 definition (81)); no external threshold. FAR-exempt areas (Rule 49) may explain small gaps — tolerance 5%."
     citation: "Imarat Nirman Bidhimala 2025 definition (81) — FAR = total floor area / plot area (exempt areas per Rule 49 excluded)"
     remediation: "Reconcile the FAR figure with total floor area / plot area on the sheet (check Rule 49 exemptions)."
+    remediation_bn: "শিটের FAR-কে মোট ফ্লোর এরিয়া / প্লট এরিয়ার সঙ্গে মিলিয়ে নিন (বিধি 49-এর ছাড়গুলো দেখুন)।"
     verify_flag: false
     display:
       kind: consistency
       fix_on: layout_far_sheet
       headline_fail: "Values on the sheet disagree"
+      headline_fail_bn: "শিটের মানগুলো মিলছে না"
       headline_pass: "FAR and floor area appear to agree"
+      headline_pass_bn: "FAR ও ফ্লোর এরিয়া মিলছে বলে মনে হচ্ছে"
       action: "Make the FAR agree with the total area including FAR divided by the plot area."
+      action_bn: "FAR-কে FAR-ভুক্ত মোট ক্ষেত্রফল ÷ জমির পরিমাণের সমান করুন।"
       tolerance: 0.05
       values:
-        - {expr: claimed_far, label: "FAR as stated"}
-        - {expr: "total_floor_area_m2 / plot_area_m2", label: "Total area including FAR ÷ plot area", format: claimed_far}
+        - {expr: claimed_far, label: "FAR as stated", label_bn: "শিটে লেখা FAR"}
+        - {expr: "total_floor_area_m2 / plot_area_m2", label: "Total area including FAR ÷ plot area", label_bn: "FAR-ভুক্ত মোট ক্ষেত্রফল ÷ জমির পরিমাণ", format: claimed_far}
 
   - id: RAJUK-MGC-004
     title: Ground coverage (MGC) within allowable (user-supplied)
+    title_bn: "ভূমি আচ্ছাদন (MGC) অনুমোদনযোগ্য সীমার মধ্যে (আপনার দেওয়া মান)"
     parameters: [claimed_mgc_pct, allowable_mgc_pct]
     logic: "claimed_mgc_pct <= allowable_mgc_pct"
     severity: High
     confidence_basis: "Principle sourced (Bidhimala 2025 Rule 45(1), Table-3); allowable % user-supplied at the gate [VERIFY] — see RAJUK-MGC-004B for the direct table check"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 45(1), Table-3 (Maximum Ground Coverage by plot size)"
     remediation: "Reduce footprint or confirm plot bracket; reconcile MGC with allowable."
+    remediation_bn: "ফুটপ্রিন্ট কমান বা প্লটের ব্র্যাকেট নিশ্চিত করুন; MGC-কে অনুমোদনযোগ্য মানের সঙ্গে মিলিয়ে নিন।"
     verify_flag: true
     display:
       kind: compare
       fix_on: layout_far_sheet
       headline_fail: "Ground coverage is above the allowed maximum"
+      headline_fail_bn: "ভূমি আচ্ছাদন অনুমোদিত সর্বোচ্চ সীমার চেয়ে বেশি"
       headline_pass: "Ground coverage appears to be within the allowed maximum"
+      headline_pass_bn: "ভূমি আচ্ছাদন অনুমোদিত সর্বোচ্চ সীমার মধ্যে আছে বলে মনে হচ্ছে"
       action: "Reduce ground coverage by {gap} to {limit}."
+      action_bn: "ভূমি আচ্ছাদন {gap} কমিয়ে {limit} করুন।"
       rows:
         - {found: claimed_mgc_pct, limit: allowable_mgc_pct, direction: max}
 
   - id: RAJUK-MGC-004B
     title: Ground coverage (MGC) vs Bidhimala Table-3 plot-size bracket
+    title_bn: "ভূমি আচ্ছাদন (MGC) বনাম বিধিমালা Table-3 প্লট-আয়তনের ব্র্যাকেট"
     parameters: [claimed_mgc_pct, plot_area_m2]
     logic: "(plot_area_m2 > 134 or claimed_mgc_pct <= 70) and (plot_area_m2 <= 134 or plot_area_m2 > 201 or claimed_mgc_pct <= 67.5) and (plot_area_m2 <= 201 or plot_area_m2 > 268 or claimed_mgc_pct <= 65) and (plot_area_m2 <= 268 or plot_area_m2 > 402 or claimed_mgc_pct <= 62.5) and (plot_area_m2 <= 402 or plot_area_m2 > 670 or claimed_mgc_pct <= 60) and (plot_area_m2 <= 670 or plot_area_m2 > 937 or claimed_mgc_pct <= 55) and (plot_area_m2 <= 937 or plot_area_m2 > 1339 or claimed_mgc_pct <= 50) and (plot_area_m2 <= 1339 or plot_area_m2 > 2677 or claimed_mgc_pct <= 45) and (plot_area_m2 <= 2677 or claimed_mgc_pct <= 40)"
     severity: High
     confidence_basis: "Brackets verbatim from Table-3 (max MGC 70/67.5/65/62.5/60/55/50/45/40% by plot size); [VERIFY] OCR'd gazette digits + Table-3 exceptions (extra paved coverage col-6, A6 affordable housing 75%, road-surrender exclusions) not encoded"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 45(1), Table-3"
     remediation: "Reduce ground coverage to the Table-3 maximum for the plot-size bracket, or document an applicable Table-3/Table-4 exception."
+    remediation_bn: "প্লট-আয়তনের ব্র্যাকেট অনুযায়ী ভূমি আচ্ছাদন Table-3-এর সর্বোচ্চ মানে নামিয়ে আনুন, অথবা প্রযোজ্য Table-3/Table-4 ব্যতিক্রমের কাগজ দিন।"
     verify_flag: true
     display:
       kind: compare
       fix_on: layout_far_sheet
       headline_fail: "Ground coverage is above the maximum for this plot size"
+      headline_fail_bn: "এই প্লট আয়তনের জন্য ভূমি আচ্ছাদন সর্বোচ্চ সীমার চেয়ে বেশি"
       headline_pass: "Ground coverage appears to be within the maximum for this plot size"
+      headline_pass_bn: "এই প্লট আয়তনের জন্য ভূমি আচ্ছাদন সর্বোচ্চ সীমার মধ্যে আছে বলে মনে হচ্ছে"
       action: "Reduce ground coverage by {gap} to {limit}."
+      action_bn: "ভূমি আচ্ছাদন {gap} কমিয়ে {limit} করুন।"
       rows:
         - {found: claimed_mgc_pct, limit: 70, direction: max, when: "plot_area_m2 <= 134"}
         - {found: claimed_mgc_pct, limit: 67.5, direction: max, when: "plot_area_m2 > 134 and plot_area_m2 <= 201"}
@@ -97,6 +120,7 @@ rules:
 
   - id: RAJUK-SETBACK-005
     title: Setbacks (front/rear/side) vs required schedule (user-supplied)
+    title_bn: "সেটব্যাক (সামনে/পেছনে/পাশে) বনাম প্রয়োজনীয় মান (আপনার দেওয়া মান)"
     parameters: [front_setback_m, rear_setback_m, side_setback_m,
                  required_front_setback_m, required_rear_setback_m, required_side_setback_m]
     logic: "front_setback_m >= required_front_setback_m and rear_setback_m >= required_rear_setback_m and side_setback_m >= required_side_setback_m"
@@ -104,101 +128,123 @@ rules:
     confidence_basis: "Principle sourced (Bidhimala 2025 Rule 41, Table-1); required values user-supplied for plan/ward specifics [VERIFY] — see RAJUK-SETBACK-005B for the direct table check"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 41 + Table-1 (minimum setbacks by storey count)"
     remediation: "Confirm setbacks meet Rule 41/Table-1 for this storey count and plot situation."
+    remediation_bn: "এই তলার সংখ্যা ও প্লটের অবস্থার জন্য সেটব্যাক বিধি 41/Table-1 পূরণ করে কি না নিশ্চিত করুন।"
     verify_flag: true
     display:
       kind: compare
       fix_on: layout_far_sheet
       headline_fail: "A setback is smaller than required"
+      headline_fail_bn: "একটি সেটব্যাক প্রয়োজনের চেয়ে কম"
       headline_pass: "Setbacks appear to be at least the required size"
+      headline_pass_bn: "সেটব্যাকগুলো প্রয়োজনীয় মাপের সমান বা বেশি বলে মনে হচ্ছে"
       rows:
-        - {found: front_setback_m, limit: required_front_setback_m, direction: min, action: "Increase the front setback by {gap} to {limit}."}
-        - {found: rear_setback_m, limit: required_rear_setback_m, direction: min, action: "Increase the rear setback by {gap} to {limit}."}
-        - {found: side_setback_m, limit: required_side_setback_m, direction: min, action: "Increase the side setback by {gap} to {limit}."}
+        - {found: front_setback_m, limit: required_front_setback_m, direction: min, action: "Increase the front setback by {gap} to {limit}.", action_bn: "সামনের সেটব্যাক {gap} বাড়িয়ে {limit} করুন।"}
+        - {found: rear_setback_m, limit: required_rear_setback_m, direction: min, action: "Increase the rear setback by {gap} to {limit}.", action_bn: "পেছনের সেটব্যাক {gap} বাড়িয়ে {limit} করুন।"}
+        - {found: side_setback_m, limit: required_side_setback_m, direction: min, action: "Increase the side setback by {gap} to {limit}.", action_bn: "পাশের সেটব্যাক {gap} বাড়িয়ে {limit} করুন।"}
 
   - id: RAJUK-SETBACK-005B
     title: Setbacks vs Bidhimala Table-1 storey bands
+    title_bn: "সেটব্যাক বনাম বিধিমালা Table-1-এর তলাভিত্তিক ধাপ"
     parameters: [num_storeys, front_setback_m, side_setback_m, rear_setback_m]
     logic: "front_setback_m >= 1.5 and (num_storeys > 7 or (side_setback_m >= 1.0 and rear_setback_m >= 1.25)) and (num_storeys <= 7 or num_storeys > 10 or (side_setback_m >= 1.25 and rear_setback_m >= 2.0)) and (num_storeys <= 10 or num_storeys > 15 or (side_setback_m >= 3.0 and rear_setback_m >= 3.0)) and (num_storeys <= 15 or num_storeys > 20 or (side_setback_m >= 3.25 and rear_setback_m >= 3.25)) and (num_storeys <= 20 or num_storeys > 30 or (side_setback_m >= 3.5 and rear_setback_m >= 3.5)) and (num_storeys <= 30 or num_storeys > 40 or (side_setback_m >= 4.5 and rear_setback_m >= 4.5)) and (num_storeys <= 40 or (side_setback_m >= 5.0 and rear_setback_m >= 5.0))"
     severity: High
     confidence_basis: "Side/rear bands verbatim from Table-1; front >= 1.5 m from boundary per Rule 41(1) (the alternative 4.5 m-from-road-centre branch is not sheet-readable). [VERIFY] OCR'd gazette digits + Rule 41(1) road-centre condition + Table-2 exceptions not encoded"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 41(1),(3), Table-1"
     remediation: "Increase side/rear setbacks to the Table-1 minimum for the storey band; keep front setback >= 1.5 m from the boundary (and >= 4.5 m from the road centre-line)."
+    remediation_bn: "তলার ধাপ অনুযায়ী পাশের/পেছনের সেটব্যাক Table-1-এর ন্যূনতম মানে বাড়ান; সামনের সেটব্যাক সীমানা থেকে >= 1.5 m (এবং রাস্তার মধ্যরেখা থেকে >= 4.5 m) রাখুন।"
     verify_flag: true
     display:
       kind: compare
       fix_on: layout_far_sheet
       headline_fail: "A setback is smaller than the minimum for this number of storeys"
+      headline_fail_bn: "এই তলার সংখ্যার জন্য একটি সেটব্যাক ন্যূনতমের চেয়ে কম"
       headline_pass: "Setbacks appear to be at least the minimum for this number of storeys"
+      headline_pass_bn: "এই তলার সংখ্যার জন্য সেটব্যাকগুলো ন্যূনতমের সমান বা বেশি বলে মনে হচ্ছে"
       rows:
-        - {found: front_setback_m, limit: 1.5, direction: min, action: "Increase the front setback by {gap} to {limit}."}
-        - {found: side_setback_m, limit: 1.0, direction: min, when: "num_storeys <= 7", action: "Increase the side setback by {gap} to {limit}."}
-        - {found: rear_setback_m, limit: 1.25, direction: min, when: "num_storeys <= 7", action: "Increase the rear setback by {gap} to {limit}."}
-        - {found: side_setback_m, limit: 1.25, direction: min, when: "num_storeys > 7 and num_storeys <= 10", action: "Increase the side setback by {gap} to {limit}."}
-        - {found: rear_setback_m, limit: 2.0, direction: min, when: "num_storeys > 7 and num_storeys <= 10", action: "Increase the rear setback by {gap} to {limit}."}
-        - {found: side_setback_m, limit: 3.0, direction: min, when: "num_storeys > 10 and num_storeys <= 15", action: "Increase the side setback by {gap} to {limit}."}
-        - {found: rear_setback_m, limit: 3.0, direction: min, when: "num_storeys > 10 and num_storeys <= 15", action: "Increase the rear setback by {gap} to {limit}."}
-        - {found: side_setback_m, limit: 3.25, direction: min, when: "num_storeys > 15 and num_storeys <= 20", action: "Increase the side setback by {gap} to {limit}."}
-        - {found: rear_setback_m, limit: 3.25, direction: min, when: "num_storeys > 15 and num_storeys <= 20", action: "Increase the rear setback by {gap} to {limit}."}
-        - {found: side_setback_m, limit: 3.5, direction: min, when: "num_storeys > 20 and num_storeys <= 30", action: "Increase the side setback by {gap} to {limit}."}
-        - {found: rear_setback_m, limit: 3.5, direction: min, when: "num_storeys > 20 and num_storeys <= 30", action: "Increase the rear setback by {gap} to {limit}."}
-        - {found: side_setback_m, limit: 4.5, direction: min, when: "num_storeys > 30 and num_storeys <= 40", action: "Increase the side setback by {gap} to {limit}."}
-        - {found: rear_setback_m, limit: 4.5, direction: min, when: "num_storeys > 30 and num_storeys <= 40", action: "Increase the rear setback by {gap} to {limit}."}
-        - {found: side_setback_m, limit: 5.0, direction: min, when: "num_storeys > 40", action: "Increase the side setback by {gap} to {limit}."}
-        - {found: rear_setback_m, limit: 5.0, direction: min, when: "num_storeys > 40", action: "Increase the rear setback by {gap} to {limit}."}
+        - {found: front_setback_m, limit: 1.5, direction: min, action: "Increase the front setback by {gap} to {limit}.", action_bn: "সামনের সেটব্যাক {gap} বাড়িয়ে {limit} করুন।"}
+        - {found: side_setback_m, limit: 1.0, direction: min, when: "num_storeys <= 7", action: "Increase the side setback by {gap} to {limit}.", action_bn: "পাশের সেটব্যাক {gap} বাড়িয়ে {limit} করুন।"}
+        - {found: rear_setback_m, limit: 1.25, direction: min, when: "num_storeys <= 7", action: "Increase the rear setback by {gap} to {limit}.", action_bn: "পেছনের সেটব্যাক {gap} বাড়িয়ে {limit} করুন।"}
+        - {found: side_setback_m, limit: 1.25, direction: min, when: "num_storeys > 7 and num_storeys <= 10", action: "Increase the side setback by {gap} to {limit}.", action_bn: "পাশের সেটব্যাক {gap} বাড়িয়ে {limit} করুন।"}
+        - {found: rear_setback_m, limit: 2.0, direction: min, when: "num_storeys > 7 and num_storeys <= 10", action: "Increase the rear setback by {gap} to {limit}.", action_bn: "পেছনের সেটব্যাক {gap} বাড়িয়ে {limit} করুন।"}
+        - {found: side_setback_m, limit: 3.0, direction: min, when: "num_storeys > 10 and num_storeys <= 15", action: "Increase the side setback by {gap} to {limit}.", action_bn: "পাশের সেটব্যাক {gap} বাড়িয়ে {limit} করুন।"}
+        - {found: rear_setback_m, limit: 3.0, direction: min, when: "num_storeys > 10 and num_storeys <= 15", action: "Increase the rear setback by {gap} to {limit}.", action_bn: "পেছনের সেটব্যাক {gap} বাড়িয়ে {limit} করুন।"}
+        - {found: side_setback_m, limit: 3.25, direction: min, when: "num_storeys > 15 and num_storeys <= 20", action: "Increase the side setback by {gap} to {limit}.", action_bn: "পাশের সেটব্যাক {gap} বাড়িয়ে {limit} করুন।"}
+        - {found: rear_setback_m, limit: 3.25, direction: min, when: "num_storeys > 15 and num_storeys <= 20", action: "Increase the rear setback by {gap} to {limit}.", action_bn: "পেছনের সেটব্যাক {gap} বাড়িয়ে {limit} করুন।"}
+        - {found: side_setback_m, limit: 3.5, direction: min, when: "num_storeys > 20 and num_storeys <= 30", action: "Increase the side setback by {gap} to {limit}.", action_bn: "পাশের সেটব্যাক {gap} বাড়িয়ে {limit} করুন।"}
+        - {found: rear_setback_m, limit: 3.5, direction: min, when: "num_storeys > 20 and num_storeys <= 30", action: "Increase the rear setback by {gap} to {limit}.", action_bn: "পেছনের সেটব্যাক {gap} বাড়িয়ে {limit} করুন।"}
+        - {found: side_setback_m, limit: 4.5, direction: min, when: "num_storeys > 30 and num_storeys <= 40", action: "Increase the side setback by {gap} to {limit}.", action_bn: "পাশের সেটব্যাক {gap} বাড়িয়ে {limit} করুন।"}
+        - {found: rear_setback_m, limit: 4.5, direction: min, when: "num_storeys > 30 and num_storeys <= 40", action: "Increase the rear setback by {gap} to {limit}.", action_bn: "পেছনের সেটব্যাক {gap} বাড়িয়ে {limit} করুন।"}
+        - {found: side_setback_m, limit: 5.0, direction: min, when: "num_storeys > 40", action: "Increase the side setback by {gap} to {limit}.", action_bn: "পাশের সেটব্যাক {gap} বাড়িয়ে {limit} করুন।"}
+        - {found: rear_setback_m, limit: 5.0, direction: min, when: "num_storeys > 40", action: "Increase the rear setback by {gap} to {limit}.", action_bn: "পেছনের সেটব্যাক {gap} বাড়িয়ে {limit} করুন।"}
 
   - id: RAJUK-PARKING-006-RATIO
     title: Parking provided meets required count (user-supplied)
+    title_bn: "দেওয়া পার্কিং প্রয়োজনীয় সংখ্যা পূরণ করে (আপনার দেওয়া মান)"
     parameters: [parking_provided, parking_required]
     logic: "parking_provided >= ceil(parking_required)"
     severity: Medium
     confidence_basis: "Principle sourced (Bidhimala 2025 Rule 53(5), Table-8); a fractional required count rounds up to a whole space (Table-8 Note 3); required count user-supplied for the actual unit mix [VERIFY] — see RAJUK-PARKING-012 for the direct slab check"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 53(5), Table-8 (minimum parking by occupancy)"
     remediation: "Reconcile required vs provided parking for the unit mix."
+    remediation_bn: "ফ্ল্যাটের ধরন অনুযায়ী প্রয়োজনীয় ও দেওয়া পার্কিং মিলিয়ে নিন।"
     verify_flag: true
     display:
       kind: compare
       fix_on: ground_floor
       headline_fail: "Parking provided is below the count required"
+      headline_fail_bn: "দেওয়া পার্কিং প্রয়োজনীয় সংখ্যার চেয়ে কম"
       headline_pass: "Parking provided appears to meet the count required"
+      headline_pass_bn: "দেওয়া পার্কিং প্রয়োজনীয় সংখ্যা পূরণ করে বলে মনে হচ্ছে"
       action: "Provide {gap} more parking spaces, to at least {limit}."
+      action_bn: "আরও {gap}টি পার্কিং দিন, মোট কমপক্ষে {limit}টি।"
       rows:
         - {found: parking_provided, limit: "ceil(parking_required)", direction: min}
 
   - id: RAJUK-PARKING-006-CONSISTENCY
     title: Parking table consistent with count shown on plan
+    title_bn: "পার্কিং টেবিল প্ল্যানে দেখানো সংখ্যার সঙ্গে মেলে"
     parameters: [parking_provided_table, parking_count_on_plan]
     logic: "consistency([parking_provided_table, parking_count_on_plan], 0.0)"
     severity: Medium
     confidence_basis: "Internal consistency — rule-independent, no external threshold"
     citation: "RAJUK submission data table vs plan — parking count reconciliation"
     remediation: "Fix the mismatch between the parking table and the count shown on plan."
+    remediation_bn: "পার্কিং টেবিল ও প্ল্যানে দেখানো সংখ্যার অমিল ঠিক করুন।"
     verify_flag: false
     display:
       kind: consistency
       fix_on: ground_floor
       headline_fail: "Values on the sheet disagree"
+      headline_fail_bn: "শিটের মানগুলো মিলছে না"
       headline_pass: "Parking table and plan appear to agree"
+      headline_pass_bn: "পার্কিং টেবিল ও প্ল্যান মিলছে বলে মনে হচ্ছে"
       action: "Make the parking table and the plan show the same number of spaces."
+      action_bn: "পার্কিং টেবিল ও প্ল্যানে একই সংখ্যক পার্কিং দেখান।"
       tolerance: 0.0
       values:
-        - {expr: parking_provided_table, label: "Parking in the table"}
-        - {expr: parking_count_on_plan, label: "Parking drawn on the plan"}
+        - {expr: parking_provided_table, label: "Parking in the table", label_bn: "টেবিলে লেখা পার্কিং"}
+        - {expr: parking_count_on_plan, label: "Parking drawn on the plan", label_bn: "প্ল্যানে আঁকা পার্কিং"}
 
   - id: RAJUK-FAR-ROADBAND-011
     title: Claimed FAR vs road-width FAR index (A3 flats, Table-5)
+    title_bn: "শিটে লেখা FAR বনাম রাস্তার প্রস্থভিত্তিক FAR সূচক (A3 ফ্ল্যাট, Table-5)"
     parameters: [claimed_far, road_width_m, area_class]
     logic: "(area_class != 'dhaka_core' or ((road_width_m < 1.8 or road_width_m >= 2.5 or claimed_far <= 1.25) and (road_width_m < 2.5 or road_width_m >= 3.66 or claimed_far <= 1.75) and (road_width_m < 3.66 or road_width_m >= 4.88 or claimed_far <= 2) and (road_width_m < 4.88 or road_width_m >= 6 or claimed_far <= 2.25 + (road_width_m - 4.88) * (3.25 - 2.25) / (6 - 4.88)) and (road_width_m < 6 or road_width_m >= 9 or claimed_far <= 3.25 + (road_width_m - 6) * (3.5 - 3.25) / (9 - 6)) and (road_width_m < 9 or road_width_m >= 12 or claimed_far <= 3.5 + (road_width_m - 9) * (4 - 3.5) / (12 - 9)) and (road_width_m < 12 or road_width_m >= 18 or claimed_far <= 4 + (road_width_m - 12) * (4.25 - 4) / (18 - 12)) and (road_width_m < 18 or road_width_m >= 24 or claimed_far <= 4.25 + (road_width_m - 18) * (4.75 - 4.25) / (24 - 18)) and (road_width_m < 24 or claimed_far <= 4.75))) and (area_class != 'outer_urban' or ((road_width_m < 1.8 or road_width_m >= 2.5 or claimed_far <= 1.25) and (road_width_m < 2.5 or road_width_m >= 3.66 or claimed_far <= 1.5) and (road_width_m < 3.66 or road_width_m >= 4.88 or claimed_far <= 1.75) and (road_width_m < 4.88 or road_width_m >= 6 or claimed_far <= 2 + (road_width_m - 4.88) * (2.5 - 2) / (6 - 4.88)) and (road_width_m < 6 or road_width_m >= 9 or claimed_far <= 2.5 + (road_width_m - 6) * (3 - 2.5) / (9 - 6)) and (road_width_m < 9 or road_width_m >= 12 or claimed_far <= 3 + (road_width_m - 9) * (3.5 - 3) / (12 - 9)) and (road_width_m < 12 or road_width_m >= 18 or claimed_far <= 3.5 + (road_width_m - 12) * (3.75 - 3.5) / (18 - 12)) and (road_width_m < 18 or road_width_m >= 24 or claimed_far <= 3.75 + (road_width_m - 18) * (4.25 - 3.75) / (24 - 18)) and (road_width_m < 24 or claimed_far <= 4.25))) and (area_class != 'other' or ((road_width_m < 1.8 or road_width_m >= 2.5 or claimed_far <= 1) and (road_width_m < 2.5 or road_width_m >= 3.66 or claimed_far <= 1.25) and (road_width_m < 3.66 or road_width_m >= 4.88 or claimed_far <= 1.5) and (road_width_m < 4.88 or road_width_m >= 6 or claimed_far <= 1.75 + (road_width_m - 4.88) * (2.3 - 1.75) / (6 - 4.88)) and (road_width_m < 6 or road_width_m >= 9 or claimed_far <= 2.3 + (road_width_m - 6) * (2.8 - 2.3) / (9 - 6)) and (road_width_m < 9 or road_width_m >= 12 or claimed_far <= 2.8 + (road_width_m - 9) * (3.3 - 2.8) / (12 - 9)) and (road_width_m < 12 or road_width_m >= 18 or claimed_far <= 3.3 + (road_width_m - 12) * (3.5 - 3.3) / (18 - 12)) and (road_width_m < 18 or road_width_m >= 24 or claimed_far <= 3.5 + (road_width_m - 18) * (4 - 3.5) / (24 - 18)) and (road_width_m < 24 or claimed_far <= 4)))"
     severity: High
     confidence_basis: "A3 row of Table-5 verbatim for all three area classes (dhaka_core / outer_urban / other). [VERIFY]: OCR'd gazette digits; Rule 47(3) allows exceeding road-FAR with DAP incentives up to max FAR; Rule 47(6) (page image, PDF p.57 / gazette p.13465): 'বিদ্যমান রাস্তাটি বর্ণিত ধাপ অপেক্ষা প্রশস্ত হইলে রাস্তার অতিরিক্ত প্রশস্ততার উপর ভিত্তি করিয়া FAR নির্ধারিত হইবে এবং উক্ত বৃদ্ধির পরিমাণ রাস্তার প্রশস্ততা অনুযায়ী পরবর্তী ধাপের FAR সূচক পর্যন্ত সমানুপাতিক হারে বৃদ্ধি পাইবে' — above a single-value step (4.88 m and up) the limit rises linearly to the next step's value; the three range columns (1.8-<2.5, 2.5-<3.66, 3.66-<4.88) stay flat; 24 m or more has no next step. area_class is user-supplied at the gate."
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 47(5), Table-5 (A3 rows 1-3) + Rule 47(6) + Rule 47(3)"
     remediation: "Check the plot's area class and road width against Table-5; if claimed FAR exceeds the road-band index, document the DAP density-block FAR and incentives that justify it."
+    remediation_bn: "প্লটের এলাকার শ্রেণি ও রাস্তার প্রস্থ Table-5-এর সঙ্গে মিলিয়ে দেখুন; শিটে লেখা FAR রাস্তার ধাপের সূচকের চেয়ে বেশি হলে যে DAP ডেনসিটি ব্লকের FAR ও প্রণোদনা তা সমর্থন করে, তার কাগজ দিন।"
     verify_flag: true
     display:
       kind: compare
       fix_on: layout_far_sheet
       headline_fail: "FAR is above the road-width limit"
+      headline_fail_bn: "FAR রাস্তার প্রস্থভিত্তিক সীমার চেয়ে বেশি"
       headline_pass: "FAR appears to be within the road-width limit"
+      headline_pass_bn: "FAR রাস্তার প্রস্থভিত্তিক সীমার মধ্যে আছে বলে মনে হচ্ছে"
       action: "Reduce FAR by {gap} to {limit}[[ (about {gap_area} of FAR-included floor area)]]."
+      action_bn: "FAR {gap} কমিয়ে {limit} করুন[[ (FAR-ভুক্ত ফ্লোর এরিয়া প্রায় {gap_area} কমবে)]]।"
       rows:
       - {found: claimed_far, limit: 1.25, direction: max, when: "area_class == 'dhaka_core' and road_width_m >= 1.8 and road_width_m < 2.5"}
       - {found: claimed_far, limit: 1.75, direction: max, when: "area_class == 'dhaka_core' and road_width_m >= 2.5 and road_width_m < 3.66"}
@@ -230,19 +276,24 @@ rules:
 
   - id: RAJUK-PARKING-012
     title: Parking (A3) vs Bidhimala Table-8 slab (uniform flat size)
+    title_bn: "পার্কিং (A3) বনাম বিধিমালা Table-8 স্ল্যাব (সব ফ্ল্যাট একই আয়তনের)"
     parameters: [num_units, avg_flat_area_m2, parking_provided, road_width_m]
     logic: "road_width_m < 2.5 or ((avg_flat_area_m2 <= 60 or avg_flat_area_m2 > 90 or parking_provided >= ceil(num_units / 4)) and (avg_flat_area_m2 <= 90 or avg_flat_area_m2 > 140 or parking_provided >= ceil(num_units / 2)) and (avg_flat_area_m2 <= 140 or avg_flat_area_m2 > 200 or parking_provided >= ceil(num_units * 2 / 3)) and (avg_flat_area_m2 <= 200 or parking_provided >= ceil(num_units * 105 / 100)) and (avg_flat_area_m2 > 60 or road_width_m < 6 or parking_provided >= 1))"
     severity: Medium
     confidence_basis: "Slabs verbatim from Table-8 rows 5-9 (>200 m2: 1/flat + 5% guest; 140-200: 2 per 3; 90-140: 1 per 2; 60-90: 1 per 4; <=60 m2: motorcycle only; road 1.8-2.5 m: no parking). Table-8 Note 3 (page image, gazette p.13475): 'পার্কিং স্পেসের চাহিদার ভগ্নাংশের ক্ষেত্রে ১ (একটি) পার্কিং হিসাব করিতে হইবে' — a fractional requirement counts as one space, so each count is rounded up. Ratios are written as integer fractions (105/100, 2/3) so a whole-number requirement is never pushed up by float error. Table-8 Note 5 (page image, gazette p.13475): 'অন্য যে কোনো ধরনের ভবনের জন্য ন্যূনতম ১ (একটি) গাড়ি পার্কিং এর ব্যবস্থা থাকিতে হইবে, তবে রাস্তা প্রশস্তকরণের প্রস্তাব না থাকিলে ৬ মিটারের কম থাকিলে প্রশস্ত রাস্তা সংলগ্ন আবাসিক ভবনের জন্য জমিতে ন্যূনতম গাড়ি পার্কিং এর শর্ত বাধ্যতামূলক হইবে না' — at least one car space; a residential building on a road under 6 m with no widening proposal is exempt. Encoded as: flats of 60 m2 or less on a road of 6 m or more need at least 1 car space (every larger slab already rounds up to 1 or more). A sub-6 m road is treated as exempt because a widening proposal is not readable off the sheet. [VERIFY]: OCR'd gazette digits; encoded for a uniform flat size — mixed unit sizes need the per-band unit mix; 90/140/200 band edges overlap in the gazette text."
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 53(5), Table-8 rows 1, 5-9, Notes 3 and 5"
     remediation: "Recompute required car parking from the unit mix per Table-8 and provide at least that many stalls."
+    remediation_bn: "Table-8 অনুযায়ী ফ্ল্যাটের ধরন থেকে প্রয়োজনীয় গাড়ি পার্কিং আবার হিসাব করুন এবং অন্তত ততগুলো পার্কিং দিন।"
     verify_flag: true
     display:
       kind: compare
       fix_on: ground_floor
       headline_fail: "Parking is below the Table-8 requirement for this flat size"
+      headline_fail_bn: "এই ফ্ল্যাট আয়তনের জন্য পার্কিং Table-8-এর প্রয়োজনের চেয়ে কম"
       headline_pass: "Parking appears to meet the Table-8 requirement"
+      headline_pass_bn: "পার্কিং Table-8-এর প্রয়োজন পূরণ করে বলে মনে হচ্ছে"
       action: "Provide at least {limit} parking spaces ({gap} more than the sheet shows)."
+      action_bn: "কমপক্ষে {limit}টি পার্কিং দিন (শিটে দেখানোর চেয়ে {gap}টি বেশি)।"
       rows:
         - {found: parking_provided, limit: "ceil(num_units / 4)", direction: min, when: "road_width_m >= 2.5 and avg_flat_area_m2 > 60 and avg_flat_area_m2 <= 90"}
         - {found: parking_provided, limit: "ceil(num_units / 2)", direction: min, when: "road_width_m >= 2.5 and avg_flat_area_m2 > 90 and avg_flat_area_m2 <= 140"}
@@ -252,239 +303,300 @@ rules:
 
   - id: RAJUK-LIFT-013
     title: "Lift count (Bidhimala) — >18 m needs a lift; >33 m/10 storeys needs 2 + stretcher lift"
+    title_bn: "লিফটের সংখ্যা (বিধিমালা) — >18 m হলে একটি লিফট; >33 m/10 তলা হলে 2টি + স্ট্রেচার লিফট"
     parameters: [building_height_m, num_storeys, num_lifts]
     logic: "(building_height_m <= 18 or num_lifts >= 1) and ((building_height_m <= 33 and num_storeys <= 10) or (num_lifts >= 2 and param_present('has_stretcher_lift')))"
     severity: High
     confidence_basis: "Thresholds verbatim from Rule 59(1) (>18 m -> lift) and 59(2) (>33 m or >10 storeys -> min 2 lifts, at least 1 stretcher lift). [VERIFY] OCR'd gazette digits + stretcher-lift presence-read reliability."
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 59(1)-(2)"
     remediation: "Provide the lift count for the height band; designate at least one stretcher lift for buildings over 33 m / 10 storeys."
+    remediation_bn: "উচ্চতার ধাপ অনুযায়ী লিফট দিন; 33 m / 10 তলার বেশি ভবনে অন্তত একটি লিফটকে স্ট্রেচার লিফট হিসেবে নির্ধারণ করুন।"
     verify_flag: true
     display:
       kind: compare
       fix_on: typical_floor
       headline_fail: "Not enough lifts for the building height"
+      headline_fail_bn: "ভবনের উচ্চতার তুলনায় লিফট কম"
       headline_pass: "Lift count appears to meet the height requirement"
+      headline_pass_bn: "লিফটের সংখ্যা উচ্চতার প্রয়োজন পূরণ করে বলে মনে হচ্ছে"
       action: "The height needs {limit} or more lifts; the sheet shows {found}."
+      action_bn: "এই উচ্চতায় {limit}টি বা তার বেশি লিফট লাগে; শিটে আছে {found}টি।"
       rows:
         - {found: num_lifts, limit: 1, direction: min, when: "building_height_m > 18"}
         - {found: num_lifts, limit: 2, direction: min, when: "building_height_m > 33 or num_storeys > 10"}
-        - {require: has_stretcher_lift, label: "Stretcher lift", headline: "A stretcher lift is not shown", when: "building_height_m > 33 or num_storeys > 10", action: "Designate one lift as a stretcher lift."}
+        - {require: has_stretcher_lift, label: "Stretcher lift", label_bn: "স্ট্রেচার লিফট", headline: "A stretcher lift is not shown", headline_bn: "স্ট্রেচার লিফট দেখানো নেই", when: "building_height_m > 33 or num_storeys > 10", action: "Designate one lift as a stretcher lift.", action_bn: "একটি লিফটকে স্ট্রেচার লিফট হিসেবে নির্ধারণ করুন।"}
 
   - id: RAJUK-STAIRWIDTH-014
     title: "Stair flight width for A3 (Bidhimala Table-10, 1.15 m)"
+    title_bn: "A3-এর সিঁড়ির ফ্লাইটের প্রস্থ (বিধিমালা Table-10, 1.15 m)"
     parameters: [exit_stair_width_m]
     logic: "exit_stair_width_m >= 1.15"
     severity: High
     confidence_basis: "Verbatim Rule 57(d)(1): 'বিভিন্ন ধরনের সিঁড়ির প্রতিটি ফ্লাইটের বাঁধামুক্ত ন্যূনতম প্রশস্ততার পরিমাপ নিম্নবর্ণিত সারণি ১০ অনুযায়ী হইবে' (minimum unobstructed width of each stair flight per Table-10). Table-10 row 1, 'A3 ফ্ল্যাট ও এ্যাপার্টমেন্ট বাড়ি' = ১.১৫ m (page image read at 400 dpi, PDF p.73 / gazette p.13481). Applies to every flight; the value checked is the extracted exit-stair width. [VERIFY]: unsigned. BNBC-STAIRWIDTH-008 sets 1.12 m for the same stair under BNBC Table 4.3.6; expert brief Q9c decides whether both rules stand."
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 57(d)(1), Table-10"
     remediation: "Widen each stair flight to at least 1.15 m clear."
+    remediation_bn: "সিঁড়ির প্রতিটি ফ্লাইটের বাধামুক্ত প্রস্থ কমপক্ষে 1.15 m করুন।"
     verify_flag: true
     display:
       kind: compare
       fix_on: typical_floor
       headline_fail: "Stair is narrower than the Bidhimala minimum"
+      headline_fail_bn: "সিঁড়ি বিধিমালার ন্যূনতম প্রস্থের চেয়ে সরু"
       headline_pass: "Stair width appears to meet the Bidhimala minimum"
+      headline_pass_bn: "সিঁড়ির প্রস্থ বিধিমালার ন্যূনতম মান পূরণ করে বলে মনে হচ্ছে"
       action: "Widen each stair flight by {gap} to at least {limit}."
+      action_bn: "সিঁড়ির প্রতিটি ফ্লাইট {gap} চওড়া করে কমপক্ষে {limit} করুন।"
       rows:
         - {found: exit_stair_width_m, limit: 1.15, direction: min}
 
   - id: RAJUK-EGRESS-015
     title: "Two fire-safe stairs above 10 storeys or 33 m (Bidhimala Appendix-1)"
+    title_bn: "10 তলা বা 33 m-এর বেশি হলে দুটি অগ্নিনিরাপদ সিঁড়ি (বিধিমালা Appendix-1)"
     parameters: [num_storeys, building_height_m, num_exit_stairs]
     logic: "(num_exit_stairs >= 2 and param_present('has_fire_rated_stair_enclosure')) if (num_storeys > 10 or building_height_m > 33) else True"
     severity: Critical
     confidence_basis: "Verbatim Appendix-1 para 12.4 (page image, PDF p.101 / gazette p.13509): '১০ তলা বা ৩৩ মিটার অপেক্ষা অধিক উচ্চতাবিশিষ্ট সকল ইমারতের জন্য ... কমপক্ষে ২টি সিঁড়ি থাকিতে হইবে এবং এই ক্ষেত্রে সিঁড়ি ঘর অগ্নিনিরাপদ হইতে হইবে' (more than 10 storeys or 33 m: at least 2 stairs, and the stairwell fire-safe). Table-5 lets A3 keep one stair up to 10 floors (at most 4 units per floor, 23 m travel), and 12.3 sets exits by users per floor below that; neither is encoded here. The fire-safe stair is read as has_fire_rated_stair_enclosure. [VERIFY]: unsigned; BNBC-EGRESS-001 keeps its 20 m screening trigger beside this sourced 33 m one (G-1)."
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Appendix-1 (fire safety) para 12.4"
     remediation: "Provide at least two exit stairs in fire-safe enclosures opening to open air or a designated safe place."
+    remediation_bn: "কমপক্ষে দুটি এক্সিট সিঁড়ি অগ্নিনিরাপদ ঘেরের মধ্যে দিন, যা খোলা জায়গায় বা নির্ধারিত নিরাপদ স্থানে খোলে।"
     verify_flag: true
     display:
       kind: compare
       fix_on: typical_floor
       headline_fail: "A building over 10 storeys or 33 m needs two fire-safe stairs"
+      headline_fail_bn: "10 তলা বা 33 m-এর বেশি ভবনে দুটি অগ্নিনিরাপদ সিঁড়ি লাগবে"
       headline_pass: "Stair count appears to meet the Bidhimala high-rise rule"
+      headline_pass_bn: "সিঁড়ির সংখ্যা বিধিমালার উঁচু ভবনের বিধি পূরণ করে বলে মনে হচ্ছে"
       action: "Show at least {limit} exit stairs; the sheet shows {found}."
+      action_bn: "কমপক্ষে {limit}টি এক্সিট সিঁড়ি দেখান; শিটে আছে {found}টি।"
       rows:
         - {found: num_exit_stairs, limit: 2, direction: min, when: "num_storeys > 10 or building_height_m > 33"}
-        - {require: has_fire_rated_stair_enclosure, label: "Fire-safe stair enclosure", headline: "The stairs are not shown as fire-safe", when: "num_storeys > 10 or building_height_m > 33", action: "Show the stair enclosures as fire-safe (fire-rated, smoke-protected)."}
+        - {require: has_fire_rated_stair_enclosure, label: "Fire-safe stair enclosure", label_bn: "অগ্নিনিরাপদ সিঁড়ি", headline: "The stairs are not shown as fire-safe", headline_bn: "সিঁড়িগুলো অগ্নিনিরাপদ হিসেবে দেখানো নেই", when: "num_storeys > 10 or building_height_m > 33", action: "Show the stair enclosures as fire-safe (fire-rated, smoke-protected).", action_bn: "সিঁড়ির ঘেরগুলো অগ্নিনিরাপদ হিসেবে দেখান (ফায়ার-রেটেড, ধোঁয়া-সুরক্ষিত)।"}
 
   - id: RAJUK-FIRESTAIR-016
     title: "Single stair above 6 storeys must be fire-safe (Bidhimala Appendix-1)"
+    title_bn: "6 তলার বেশি ভবনে একটিমাত্র সিঁড়ি হলে তা অগ্নিনিরাপদ হতে হবে (বিধিমালা Appendix-1)"
     parameters: [num_storeys, num_exit_stairs]
     logic: "num_storeys <= 6 or num_exit_stairs >= 2 or param_present('has_fire_rated_stair_enclosure')"
     severity: Critical
     confidence_basis: "Verbatim Appendix-1 Table-4 Note (2) (page image, PDF p.98 / gazette p.13506): '৬ তলার অধিক উচ্চতা বিশিষ্ট আবাসিক (A-2, A3, A-4, A-5) ইমারতে একটি মাত্র সিঁড়ি থাকিলে উক্ত সিঁড়িটি অগ্নি নিরাপদ সিঁড়ি হইতে হইবে' (a residential building over 6 storeys with only one stair: that stair must be fire-safe). The fire-safe stair is read as has_fire_rated_stair_enclosure. [VERIFY]: unsigned; G-2."
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Appendix-1 (fire safety) Table-4 Note (2)"
     remediation: "Make the single stair a fire-safe stair, or add a second exit stair."
+    remediation_bn: "একমাত্র সিঁড়িটিকে অগ্নিনিরাপদ সিঁড়ি করুন, অথবা দ্বিতীয় একটি এক্সিট সিঁড়ি যোগ করুন।"
     verify_flag: true
     display:
       kind: presence
       fix_on: typical_floor
       headline_fail: "The only stair of a building over 6 storeys is not shown as fire-safe"
+      headline_fail_bn: "6 তলার বেশি ভবনের একমাত্র সিঁড়ি অগ্নিনিরাপদ হিসেবে দেখানো নেই"
       headline_pass: "Stair fire safety appears to be shown"
+      headline_pass_bn: "সিঁড়ির অগ্নিনিরাপত্তা দেখানো আছে বলে মনে হচ্ছে"
       action: "Show on the plans: {missing}, or add a second exit stair."
+      action_bn: "প্ল্যানে দেখান: {missing}, অথবা দ্বিতীয় একটি এক্সিট সিঁড়ি যোগ করুন।"
       rows:
-        - {require: has_fire_rated_stair_enclosure, label: "Fire-safe stair enclosure", when: "num_storeys > 6 and num_exit_stairs < 2"}
+        - {require: has_fire_rated_stair_enclosure, label: "Fire-safe stair enclosure", label_bn: "অগ্নিনিরাপদ সিঁড়ি", when: "num_storeys > 6 and num_exit_stairs < 2"}
 
   - id: RAJUK-TRAVEL-017
     title: "Maximum travel distance to an exit, class A (Bidhimala 23 m)"
+    title_bn: "এক্সিট পর্যন্ত সর্বোচ্চ দূরত্ব, শ্রেণি A (বিধিমালা 23 m)"
     parameters: [max_travel_distance_m]
     logic: "max_travel_distance_m <= 23"
     severity: High
     confidence_basis: "Verbatim Appendix-1 para 13.1(ক) (page image, PDF p.101 / gazette p.13509): 'ভবনের শ্রেণি A, B, C, D, I, J - ২৩ মি:' (maximum distance from the used floor to any exit). Table-5 sets the same 23 m for a single-stair A3 building, so 23 m applies with one exit or several. No sprinkler allowance is printed. [VERIFY]: unsigned; BNBC-TRAVEL-011 allows 45 m (60 m sprinklered) for A3 — expert brief Q9d decides which governs a RAJUK submission."
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Appendix-1 (fire safety) para 13.1(a) + Table-5"
     remediation: "Rearrange or add exits so no point on a floor is more than 23 m from an exit."
+    remediation_bn: "এক্সিটের অবস্থান বদলান বা এক্সিট বাড়ান, যাতে তলার কোনো জায়গা থেকে এক্সিট 23 m-এর বেশি দূরে না থাকে।"
     verify_flag: true
     display:
       kind: compare
       fix_on: typical_floor
       headline_fail: "Travel distance to an exit is over the Bidhimala 23 m limit"
+      headline_fail_bn: "এক্সিট পর্যন্ত দূরত্ব বিধিমালার 23 m সীমার চেয়ে বেশি"
       headline_pass: "Travel distance appears to be within the Bidhimala limit"
+      headline_pass_bn: "এক্সিট পর্যন্ত দূরত্ব বিধিমালার সীমার মধ্যে আছে বলে মনে হচ্ছে"
       action: "Shorten the travel path by {gap} to {limit}, or add exits."
+      action_bn: "এক্সিট পর্যন্ত পথ {gap} কমিয়ে {limit} করুন, অথবা এক্সিট বাড়ান।"
       rows:
         - {found: max_travel_distance_m, limit: 23, direction: max}
 
   - id: RAJUK-ROOM-018
     title: "Other habitable rooms at least 5 m2 and 2 m wide (Bidhimala Rule 57(a))"
+    title_bn: "অন্যান্য বসবাসযোগ্য কক্ষ কমপক্ষে 5 m² ও 2 m চওড়া (বিধিমালার বিধি 57(a))"
     parameters: [room_area_m2, room_width_m]
     logic: "room_area_m2 >= 5 and room_width_m >= 2"
     severity: Medium
     confidence_basis: "Verbatim Rule 57(a)(1) (page image, PDF p.72 / gazette p.13480): 'আবাসিক ভবনের প্রতিটি ইউনিটের ক্ষেত্রে ন্যূনতম ২.৯ মিটার প্রস্থ ও ৯.৫ বর্গমিটার ক্ষেত্রফল বিশিষ্ট অন্তত একটি কক্ষ থাকিতে হইবে এবং অন্যান্য বাসযোগ্য কক্ষসমূহের জন্য সর্বনিম্ন ক্ষেত্রফল ৫ বর্গমিটার এবং ন্যূনতম প্রস্থ ২ মিটার হইতে হইবে' (at least one room 9.5 m2 x 2.9 m per unit; other habitable rooms 5 m2 x 2 m). Checked against the smallest labelled habitable room. BNBC 1.14.2.2 sets 9.5 m2 / 2.9 m for ALL habitable rooms (BNBC-ROOM-007), so a room between 5 and 9.5 m2 passes this rule and fails the BNBC one; the expert decides which governs. The one-room 9.5 m2 clause is not a separate rule: the smallest-room read cannot show it, and BNBC-ROOM-007 already applies 9.5 m2 to every room. [VERIFY]"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 57(a)(1)"
     remediation: "Enlarge the room to at least 5 m2 and 2 m wide."
+    remediation_bn: "কক্ষটি কমপক্ষে 5 m² ও 2 m চওড়া করুন।"
     verify_flag: true
     display:
       kind: compare
       fix_on: typical_floor
       headline_fail: "A habitable room is below the Bidhimala minimum"
+      headline_fail_bn: "একটি বসবাসযোগ্য কক্ষ বিধিমালার ন্যূনতমের চেয়ে ছোট"
       headline_pass: "Habitable rooms appear to meet the Bidhimala minimum"
+      headline_pass_bn: "বসবাসযোগ্য কক্ষগুলো বিধিমালার ন্যূনতম মান পূরণ করে বলে মনে হচ্ছে"
       rows:
-        - {found: room_area_m2, limit: 5, direction: min, action: "Enlarge the room by {gap} to at least {limit}."}
-        - {found: room_width_m, limit: 2, direction: min, action: "Widen the room by {gap} to at least {limit}."}
+        - {found: room_area_m2, limit: 5, direction: min, action: "Enlarge the room by {gap} to at least {limit}.", action_bn: "কক্ষটি {gap} বাড়িয়ে কমপক্ষে {limit} করুন।"}
+        - {found: room_width_m, limit: 2, direction: min, action: "Widen the room by {gap} to at least {limit}.", action_bn: "কক্ষের প্রস্থ {gap} বাড়িয়ে কমপক্ষে {limit} করুন।"}
 
   - id: RAJUK-KITCHEN-019
     title: "Kitchen at least 4 m2 and 1.5 m wide (Bidhimala Rule 57(b))"
+    title_bn: "রান্নাঘর কমপক্ষে 4 m² ও 1.5 m চওড়া (বিধিমালার বিধি 57(b))"
     parameters: [kitchen_area_m2, kitchen_width_m]
     logic: "kitchen_area_m2 >= 4 and kitchen_width_m >= 1.5"
     severity: Medium
     confidence_basis: "Verbatim Rule 57(b)(1) (page image, PDF p.72 / gazette p.13480): 'রান্নাঘরের ন্যূনতম ক্ষেত্রফল ৪ বর্গমিটার এবং প্রস্থ ন্যূনতম ১.৫ মিটার হইবে' (kitchen at least 4 m2 and 1.5 m wide). BNBC 1.14.3.2 states the same 4 m2 / 1.5 m for a kitchen without dining. Checked against the smallest labelled kitchen. [VERIFY]"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 57(b)(1)"
     remediation: "Enlarge the kitchen to at least 4 m2 and 1.5 m wide."
+    remediation_bn: "রান্নাঘর কমপক্ষে 4 m² ও 1.5 m চওড়া করুন।"
     verify_flag: true
     display:
       kind: compare
       fix_on: typical_floor
       headline_fail: "A kitchen is below the minimum size"
+      headline_fail_bn: "একটি রান্নাঘর ন্যূনতম মাপের চেয়ে ছোট"
       headline_pass: "Kitchen size appears to meet the minimum"
+      headline_pass_bn: "রান্নাঘরের মাপ ন্যূনতম মান পূরণ করে বলে মনে হচ্ছে"
       rows:
-        - {found: kitchen_area_m2, limit: 4, direction: min, action: "Enlarge the kitchen by {gap} to at least {limit}."}
-        - {found: kitchen_width_m, limit: 1.5, direction: min, action: "Widen the kitchen by {gap} to at least {limit}."}
+        - {found: kitchen_area_m2, limit: 4, direction: min, action: "Enlarge the kitchen by {gap} to at least {limit}.", action_bn: "রান্নাঘর {gap} বাড়িয়ে কমপক্ষে {limit} করুন।"}
+        - {found: kitchen_width_m, limit: 1.5, direction: min, action: "Widen the kitchen by {gap} to at least {limit}.", action_bn: "রান্নাঘরের প্রস্থ {gap} বাড়িয়ে কমপক্ষে {limit} করুন।"}
 
   - id: RAJUK-TOILET-020
     title: "Toilet at least 1.2 m2 and 1 m wide (Bidhimala Rule 57(c))"
+    title_bn: "টয়লেট কমপক্ষে 1.2 m² ও 1 m চওড়া (বিধিমালার বিধি 57(c))"
     parameters: [toilet_area_m2, toilet_width_m]
     logic: "toilet_area_m2 >= 1.2 and toilet_width_m >= 1"
     severity: Medium
     confidence_basis: "Verbatim Rule 57(c)(2) (page image, PDF p.72 / gazette p.13480): 'বেসিন ও ওয়াটার ক্লোজেট সংবলিত টয়লেটের ক্ষেত্রে ন্যূনতম ফ্লোর এরিয়া ১.২ বর্গমিটার এবং ন্যূনতম প্রস্থ ১ মিটার হইবে'; 57(c)(5) (p.13481) gives the same 1.2 m2 / 1 m for a WC only. Those are the smallest of the five toilet types, so they are checked against the smallest labelled toilet. Toilets with a bathing space need more (WC + bath 2.8 m2 / 1 m; basin + WC + bath 3.0 m2 / 1.25 m; basin + bath 1.5 m2 / 1 m), but fixtures are not reliably readable from a label, so those minimums are not encoded. [VERIFY]"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 57(c)(2),(5)"
     remediation: "Enlarge the toilet to at least 1.2 m2 and 1 m wide (more if it holds a bathing space)."
+    remediation_bn: "টয়লেট কমপক্ষে 1.2 m² ও 1 m চওড়া করুন (গোসলের জায়গা থাকলে আরও বেশি)।"
     verify_flag: true
     display:
       kind: compare
       fix_on: typical_floor
       headline_fail: "A toilet is below the smallest allowed size"
+      headline_fail_bn: "একটি টয়লেট সবচেয়ে ছোট অনুমোদিত মাপের চেয়েও ছোট"
       headline_pass: "Toilet size appears to meet the minimum"
+      headline_pass_bn: "টয়লেটের মাপ ন্যূনতম মান পূরণ করে বলে মনে হচ্ছে"
       rows:
-        - {found: toilet_area_m2, limit: 1.2, direction: min, action: "Enlarge the toilet by {gap} to at least {limit}."}
-        - {found: toilet_width_m, limit: 1, direction: min, action: "Widen the toilet by {gap} to at least {limit}."}
+        - {found: toilet_area_m2, limit: 1.2, direction: min, action: "Enlarge the toilet by {gap} to at least {limit}.", action_bn: "টয়লেট {gap} বাড়িয়ে কমপক্ষে {limit} করুন।"}
+        - {found: toilet_width_m, limit: 1, direction: min, action: "Widen the toilet by {gap} to at least {limit}.", action_bn: "টয়লেটের প্রস্থ {gap} বাড়িয়ে কমপক্ষে {limit} করুন।"}
 
   - id: RAJUK-STAIRGEOM-021
     title: "Stair riser at most 175 mm, tread at least 225 mm, sum at least 400 mm (Bidhimala Rule 57(d)(2))"
+    title_bn: "সিঁড়ির রাইজার সর্বোচ্চ 175 mm, ট্রেড কমপক্ষে 225 mm, দুটির যোগফল কমপক্ষে 400 mm (বিধিমালার বিধি 57(d)(2))"
     parameters: [stair_riser_mm, stair_tread_mm]
     logic: "stair_riser_mm <= 175 and stair_tread_mm >= 225 and stair_riser_mm + stair_tread_mm >= 400"
     severity: High
     confidence_basis: "Verbatim Rule 57(d)(2) (page image, PDF p.74 / gazette p.13482): 'সিঁড়ির রাইজার ও ট্রেডের পরিমাপ এমন হইবে যেন একটি রাইজার ও একটি ট্রেডের যোগফল কমপক্ষে ৪০০ মিলিমিটার হয় এবং রাইজারের সর্বোচ্চ মাপ ১৭৫ মিলিমিটার এবং ট্রেডের সর্বনিম্ন মাপ ২২৫ মিলিমিটার হয়' (riser + tread at least 400 mm; riser at most 175 mm; tread at least 225 mm). [VERIFY]"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 57(d)(2)"
     remediation: "Redesign the stair so each riser is at most 175 mm, each tread at least 225 mm, and riser + tread at least 400 mm."
+    remediation_bn: "সিঁড়ি নতুন করে নকশা করুন, যাতে প্রতিটি রাইজার সর্বোচ্চ 175 mm, প্রতিটি ট্রেড কমপক্ষে 225 mm এবং রাইজার + ট্রেড কমপক্ষে 400 mm হয়।"
     verify_flag: true
     display:
       kind: compare
       fix_on: sections_elevations
       headline_fail: "Stair riser or tread is outside the allowed size"
+      headline_fail_bn: "সিঁড়ির রাইজার বা ট্রেড অনুমোদিত মাপের বাইরে"
       headline_pass: "Stair riser and tread appear to be within the limits"
+      headline_pass_bn: "সিঁড়ির রাইজার ও ট্রেড সীমার মধ্যে আছে বলে মনে হচ্ছে"
       rows:
-        - {found: stair_riser_mm, limit: 175, direction: max, action: "Lower the riser by {gap} to at most {limit}."}
-        - {found: stair_tread_mm, limit: 225, direction: min, action: "Deepen the tread by {gap} to at least {limit}."}
-        - {found: "stair_riser_mm + stair_tread_mm", label: "Riser + tread", limit: 400, direction: min, format: stair_riser_mm, action: "Increase riser + tread by {gap} to at least {limit}."}
+        - {found: stair_riser_mm, limit: 175, direction: max, action: "Lower the riser by {gap} to at most {limit}.", action_bn: "রাইজার {gap} কমিয়ে সর্বোচ্চ {limit} করুন।"}
+        - {found: stair_tread_mm, limit: 225, direction: min, action: "Deepen the tread by {gap} to at least {limit}.", action_bn: "ট্রেড {gap} বাড়িয়ে কমপক্ষে {limit} করুন।"}
+        - {found: "stair_riser_mm + stair_tread_mm", label: "Riser + tread", label_bn: "রাইজার + ট্রেড", limit: 400, direction: min, format: stair_riser_mm, action: "Increase riser + tread by {gap} to at least {limit}.", action_bn: "রাইজার + ট্রেড {gap} বাড়িয়ে কমপক্ষে {limit} করুন।"}
 
   - id: RAJUK-STAIRFLIGHT-022
     title: "At most 20 steps in one stair flight (Bidhimala Rule 57(d)(4))"
+    title_bn: "সিঁড়ির এক ফ্লাইটে সর্বোচ্চ 20টি ধাপ (বিধিমালার বিধি 57(d)(4))"
     parameters: [stair_steps_per_flight]
     logic: "stair_steps_per_flight <= 20"
     severity: Medium
     confidence_basis: "Verbatim Rule 57(d)(4) (page image, PDF p.74 / gazette p.13482): 'সিঁড়ির যে কোনো একটি ফ্লাইটে মোট ধাপের সংখ্যা সর্বোচ্চ ২০ এর মধ্যে সীমাবদ্ধ থাকিতে হইবে' (at most 20 steps in any one flight). [VERIFY]"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 57(d)(4)"
     remediation: "Add a landing so no flight has more than 20 steps."
+    remediation_bn: "একটি ল্যান্ডিং যোগ করুন, যাতে কোনো ফ্লাইটে 20টির বেশি ধাপ না থাকে।"
     verify_flag: true
     display:
       kind: compare
       fix_on: sections_elevations
       headline_fail: "A stair flight has more than 20 steps"
+      headline_fail_bn: "সিঁড়ির একটি ফ্লাইটে 20টির বেশি ধাপ"
       headline_pass: "Stair flights appear to be within 20 steps"
+      headline_pass_bn: "সিঁড়ির ফ্লাইটগুলো 20 ধাপের মধ্যে আছে বলে মনে হচ্ছে"
       action: "Split the flight with a landing; it has {found} steps, the limit is {limit}."
+      action_bn: "ফ্লাইটটি একটি ল্যান্ডিং দিয়ে ভাগ করুন; এতে {found}টি ধাপ আছে, সীমা {limit}টি।"
       rows:
         - {found: stair_steps_per_flight, limit: 20, direction: max}
 
   - id: RAJUK-ROOMHEIGHT-023
     title: "Habitable room clear height at least 2.75 m (Bidhimala Rule 57(a)(2))"
+    title_bn: "বসবাসযোগ্য কক্ষের বাধামুক্ত উচ্চতা কমপক্ষে 2.75 m (বিধিমালার বিধি 57(a)(2))"
     parameters: [room_clear_height_m]
     logic: "room_clear_height_m >= 2.75"
     severity: Medium
     confidence_basis: "Verbatim Rule 57(a)(2) (page image, PDF p.72 / gazette p.13480): 'বসবাসযোগ্য কক্ষের ন্যূনতম উচ্চতা ২.৭৫ মিটার হইবে' (habitable room at least 2.75 m high). The same clause allows 2.15 m under an exposed beam and 2.44 m under a false ceiling in an air-conditioned room; those are not encoded, so a sheet stating only a false-ceiling height may flag. [VERIFY]"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 57(a)(2)"
     remediation: "Raise the habitable room clear height to at least 2.75 m (2.44 m under a false ceiling in an air-conditioned room)."
+    remediation_bn: "বসবাসযোগ্য কক্ষের বাধামুক্ত উচ্চতা কমপক্ষে 2.75 m করুন (শীতাতপ নিয়ন্ত্রিত কক্ষে ফলস সিলিংয়ের নিচে 2.44 m)।"
     verify_flag: true
     display:
       kind: compare
       fix_on: sections_elevations
       headline_fail: "Habitable room height is below the minimum"
+      headline_fail_bn: "বসবাসযোগ্য কক্ষের উচ্চতা ন্যূনতমের চেয়ে কম"
       headline_pass: "Habitable room height appears to meet the minimum"
+      headline_pass_bn: "বসবাসযোগ্য কক্ষের উচ্চতা ন্যূনতম মান পূরণ করে বলে মনে হচ্ছে"
       action: "Raise the clear height by {gap} to at least {limit}."
+      action_bn: "বাধামুক্ত উচ্চতা {gap} বাড়িয়ে কমপক্ষে {limit} করুন।"
       rows:
         - {found: room_clear_height_m, limit: 2.75, direction: min}
 
   - id: RAJUK-BALCONY-024
     title: "Front balcony area at most 30% of road-facing width x 1 m (Bidhimala Rule 46, Table-4)"
+    title_bn: "সামনের ব্যালকনির ক্ষেত্রফল সর্বোচ্চ রাস্তার দিকের প্রস্থের 30% x 1 m (বিধিমালার বিধি 46, Table-4)"
     parameters: [front_balcony_area_m2, road_facing_width_m]
     logic: "front_balcony_area_m2 <= road_facing_width_m * 30 / 100 * 1"
     severity: Medium
     confidence_basis: "Verbatim Rule 46(1), Table-4 row 5 (page image, PDF p.51 / gazette p.13459): 'ব্যালকনির ক্ষেত্রফল ইমারতের রাস্তা সংলগ্ন প্রস্থের ৩০% এবং ১ মিটার ব্যালকনির প্রস্থ বিবেচনা করিলে যাহা হয় তাহার অধিক হইতে পারিবে না' (balcony area at most 30% of the road-facing building width x 1 m balcony depth). Conditions: not in the setback, road-facing sides only, not below 3.50 m above ground; those three are not encoded. Checked per floor. RAJUK applied this formula to the Uttara 15/C-1 submission (brief Q7b). [VERIFY]"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 46(1), Table-4 row 5"
     remediation: "Reduce the road-facing balcony area on each floor to 30% of the road-facing width x 1 m."
+    remediation_bn: "প্রতি তলায় রাস্তার দিকের ব্যালকনির ক্ষেত্রফল রাস্তার দিকের প্রস্থের 30% x 1 m-এ নামিয়ে আনুন।"
     verify_flag: true
     display:
       kind: compare
       fix_on: typical_floor
       headline_fail: "Front balcony is larger than allowed"
+      headline_fail_bn: "সামনের ব্যালকনি অনুমোদিত মাপের চেয়ে বড়"
       headline_pass: "Front balcony appears to be within the allowed area"
+      headline_pass_bn: "সামনের ব্যালকনি অনুমোদিত ক্ষেত্রফলের মধ্যে আছে বলে মনে হচ্ছে"
       action: "Reduce the front balcony on each floor by {gap} to {limit}."
+      action_bn: "প্রতি তলায় সামনের ব্যালকনি {gap} কমিয়ে {limit} করুন।"
       rows:
         - {found: front_balcony_area_m2, limit: "road_facing_width_m * 30 / 100 * 1", direction: max}
 
   - id: RAJUK-PERMEABLE-025
     title: "Rainwater absorption area vs Bidhimala Table-3 (plot-size bracket)"
+    title_bn: "বৃষ্টির পানি শোষণের জায়গা বনাম বিধিমালা Table-3 (প্লট-আয়তনের ব্র্যাকেট)"
     parameters: [permeable_area_m2, plot_area_m2]
     logic: "(plot_area_m2 > 134 or permeable_area_m2 >= plot_area_m2 * 15 / 100) and (plot_area_m2 <= 134 or plot_area_m2 > 201 or permeable_area_m2 >= plot_area_m2 * 16.25 / 100) and (plot_area_m2 <= 201 or plot_area_m2 > 268 or permeable_area_m2 >= plot_area_m2 * 17.5 / 100) and (plot_area_m2 <= 268 or plot_area_m2 > 402 or permeable_area_m2 >= plot_area_m2 * 18.75 / 100) and (plot_area_m2 <= 402 or plot_area_m2 > 670 or permeable_area_m2 >= plot_area_m2 * 20 / 100) and (plot_area_m2 <= 670 or plot_area_m2 > 937 or permeable_area_m2 >= plot_area_m2 * 22.5 / 100) and (plot_area_m2 <= 937 or plot_area_m2 > 1339 or permeable_area_m2 >= plot_area_m2 * 25 / 100) and (plot_area_m2 <= 1339 or plot_area_m2 > 2677 or permeable_area_m2 >= plot_area_m2 * 27.5 / 100) and (plot_area_m2 <= 2677 or permeable_area_m2 >= plot_area_m2 * 30 / 100)"
     severity: Medium
     confidence_basis: "Table-3 column 7 (page image, PDF p.48 / gazette p.13456), 'বৃষ্টির পানি শোষণার্থে বাধ্যতামূলক অনাচ্ছাদিত এলাকা': 15 / 16.25 / 17.5 / 18.75 / 20 / 22.5 / 25 / 27.5 / 30% of the land by plot bracket (same edges as RAJUK-MGC-004B). Rule 45(4): that area stays fully permeable, with no foundation or paving above or below ground. The bracket edges carry the katha-edge question of Q8c. [VERIFY]"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 45(1),(4), Table-3 column 7"
     remediation: "Keep at least the Table-3 share of the plot unpaved and permeable for rainwater, with nothing built above or below it."
+    remediation_bn: "প্লটের অন্তত Table-3-এর অংশটুকু বৃষ্টির পানি শোষণের জন্য পাকা না করে খোলা রাখুন; এর ওপরে বা নিচে কিছু নির্মাণ করবেন না।"
     verify_flag: true
     display:
       kind: compare
       fix_on: layout_far_sheet
       headline_fail: "Rainwater absorption area is below the minimum for this plot size"
+      headline_fail_bn: "এই প্লট আয়তনের জন্য বৃষ্টির পানি শোষণের জায়গা ন্যূনতমের চেয়ে কম"
       headline_pass: "Rainwater absorption area appears to meet the minimum"
+      headline_pass_bn: "বৃষ্টির পানি শোষণের জায়গা ন্যূনতম মান পূরণ করে বলে মনে হচ্ছে"
       action: "Add {gap} of permeable area, to at least {limit}."
+      action_bn: "আরও {gap} শোষণযোগ্য জায়গা রাখুন, মোট কমপক্ষে {limit}।"
       rows:
         - {found: permeable_area_m2, limit: "plot_area_m2 * 15 / 100", direction: min, when: "plot_area_m2 <= 134"}
         - {found: permeable_area_m2, limit: "plot_area_m2 * 16.25 / 100", direction: min, when: "plot_area_m2 > 134 and plot_area_m2 <= 201"}
@@ -498,19 +610,24 @@ rules:
 
   - id: RAJUK-PAVED-026
     title: "Paved cover beyond the footprint vs Bidhimala Table-3 (column 6, Note 1)"
+    title_bn: "ফুটপ্রিন্টের বাইরের পাকা অংশ বনাম বিধিমালা Table-3 (column 6, Note 1)"
     parameters: [paved_coverage_m2, plot_area_m2]
     logic: "(plot_area_m2 > 134 or paved_coverage_m2 <= plot_area_m2 * 5 / 100) and (plot_area_m2 <= 134 or plot_area_m2 > 201 or paved_coverage_m2 <= plot_area_m2 * 7.5 / 100) and (plot_area_m2 <= 201 or plot_area_m2 > 268 or paved_coverage_m2 <= plot_area_m2 * 10 / 100) and (plot_area_m2 <= 268 or plot_area_m2 > 402 or paved_coverage_m2 <= plot_area_m2 * 12.5 / 100) and (plot_area_m2 <= 402 or plot_area_m2 > 670 or paved_coverage_m2 <= plot_area_m2 * 15 / 100) and (plot_area_m2 <= 670 or plot_area_m2 > 937 or paved_coverage_m2 <= plot_area_m2 * 20 / 100) and (plot_area_m2 <= 937 or plot_area_m2 > 1339 or paved_coverage_m2 <= plot_area_m2 * 25 / 100) and (plot_area_m2 <= 1339 or plot_area_m2 > 2677 or paved_coverage_m2 <= plot_area_m2 * 27.5 / 100) and (plot_area_m2 <= 2677 or paved_coverage_m2 <= plot_area_m2 * 30 / 100)"
     severity: Medium
     confidence_basis: "Table-3 column 6 (page image, PDF p.48 / gazette p.13456): additional ground coverage allowed under the Table-4 exceptions, 15 / 16.25 / 17.5 / 18.75 / 20 / 22.5 / 25 / 27.5 / 30% of the land. Note 1 (gazette p.13457): except affordable housing, columns 4 and 6 together may not exceed 75% of the land. Encoded limit = min(column 6, 75 - column 4) = 5 / 7.5 / 10 / 12.5 / 15 / 20 / 25 / 27.5 / 30%. Table-4 row 1: paved cover beyond MGC may serve only a driveway, parking and a security booth. [VERIFY]"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 45(1), Table-3 column 6 and Note 1; Rule 46, Table-4 row 1"
     remediation: "Reduce paved cover outside the building to the Table-3 limit for the plot size."
+    remediation_bn: "ভবনের বাইরের পাকা অংশ প্লট আয়তনের জন্য Table-3-এর সীমায় নামিয়ে আনুন।"
     verify_flag: true
     display:
       kind: compare
       fix_on: layout_far_sheet
       headline_fail: "Paved cover outside the building is above the limit for this plot size"
+      headline_fail_bn: "এই প্লট আয়তনের জন্য ভবনের বাইরের পাকা অংশ সীমার চেয়ে বেশি"
       headline_pass: "Paved cover appears to be within the limit"
+      headline_pass_bn: "পাকা অংশ সীমার মধ্যে আছে বলে মনে হচ্ছে"
       action: "Reduce paved cover by {gap} to {limit}."
+      action_bn: "পাকা অংশ {gap} কমিয়ে {limit} করুন।"
       rows:
         - {found: paved_coverage_m2, limit: "plot_area_m2 * 5 / 100", direction: max, when: "plot_area_m2 <= 134"}
         - {found: paved_coverage_m2, limit: "plot_area_m2 * 7.5 / 100", direction: max, when: "plot_area_m2 > 134 and plot_area_m2 <= 201"}
@@ -524,176 +641,223 @@ rules:
 
   - id: RAJUK-AVIATION-027
     title: "Red safety light on buildings 45.70 m or taller (Bidhimala Rule 50(3))"
+    title_bn: "45.70 m বা তার বেশি উঁচু ভবনে লাল নিরাপত্তা বাতি (বিধিমালার বিধি 50(3))"
     parameters: [building_height_m]
     logic: "building_height_m < 45.7 or param_present('has_aviation_light')"
     severity: Medium
     confidence_basis: "Verbatim Rule 50(3) (page image, PDF p.61 / gazette p.13469): 'কোনো ইমারত ৪৫.৭০ মিটার বা তদূর্ধ্ব উচ্চতার হইলে ইমারতের শীর্ষে লাল নিরাপত্তা বাতি স্থাপন করিতে হইবে' (a building 45.70 m or taller needs a red safety light on top). [VERIFY]"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 50(3)"
     remediation: "Show a red safety (aviation obstruction) light at the top of the building."
+    remediation_bn: "ভবনের শীর্ষে লাল নিরাপত্তা বাতি (বিমান চলাচলের সতর্কবাতি) দেখান।"
     verify_flag: true
     display:
       kind: presence
       fix_on: sections_elevations
       headline_fail: "No red safety light is shown on a building this tall"
+      headline_fail_bn: "এত উঁচু ভবনে লাল নিরাপত্তা বাতি দেখানো নেই"
       headline_pass: "Red safety light appears to be shown, or is not needed at this height"
+      headline_pass_bn: "লাল নিরাপত্তা বাতি দেখানো আছে বলে মনে হচ্ছে, অথবা এই উচ্চতায় এটি লাগে না"
       action: "Show on the elevations or roof plan: {missing}."
+      action_bn: "এলিভেশন বা রুফ প্ল্যানে দেখান: {missing}।"
       rows:
-        - {require: has_aviation_light, label: "Red safety light at the top", when: "building_height_m >= 45.7"}
+        - {require: has_aviation_light, label: "Red safety light at the top", label_bn: "শীর্ষে লাল নিরাপত্তা বাতি", when: "building_height_m >= 45.7"}
 
   - id: RAJUK-RAMP-028
     title: "Car ramp no steeper than 1:8 (Bidhimala Rule 53(8))"
+    title_bn: "গাড়ির র‍্যাম্পের ঢাল 1:8-এর চেয়ে খাড়া নয় (বিধিমালার বিধি 53(8))"
     parameters: [ramp_slope_1_in_n]
     logic: "ramp_slope_1_in_n >= 8"
     severity: Medium
     confidence_basis: "Verbatim Rule 53(8) (page image, PDF p.68 / gazette p.13476): 'পার্কিং স্থানে প্রবেশ বা নির্গমনের র‍্যাম্পব্যবহারের ক্ষেত্রে সর্বোচ্চ ঢাল ১:৮ হইবে এবং র‍্যাম্প আরম্ভের পূর্বে ৪.২৫ মিটার দীর্ঘ আনুভূমিক পথ থাকিতে হইবে, তবে ০.৭৫ মিটার পর্যন্ত প্রারম্ভিক উচ্চতায় উঠা বা নামিবার জন্য উক্ত শর্ত প্রযোজ্য হইবে না' (parking ramp at most 1:8, with a 4.25 m level run before it; a rise of up to 0.75 m is exempt). Read as N in a slope labelled 1:N. The 4.25 m level run and the 0.75 m exemption are not encoded. [VERIFY]"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 53(8)"
     remediation: "Lengthen the ramp so its slope is 1:8 or gentler."
+    remediation_bn: "র‍্যাম্প লম্বা করুন, যাতে ঢাল 1:8 বা তার চেয়ে কম খাড়া হয়।"
     verify_flag: true
     display:
       kind: compare
       fix_on: ground_floor
       headline_fail: "Car ramp is steeper than 1:8"
+      headline_fail_bn: "গাড়ির র‍্যাম্প 1:8-এর চেয়ে খাড়া"
       headline_pass: "Car ramp slope appears to be within 1:8"
+      headline_pass_bn: "গাড়ির র‍্যাম্পের ঢাল 1:8-এর মধ্যে আছে বলে মনে হচ্ছে"
       action: "Make the ramp at least 1:{limit}; the sheet shows 1:{found}."
+      action_bn: "র‍্যাম্পের ঢাল কমপক্ষে 1:{limit} করুন; শিটে আছে 1:{found}।"
       rows:
         - {found: ramp_slope_1_in_n, limit: 8, direction: min}
 
   - id: RAJUK-RAMPWIDTH-029
     title: "Car ramp at least 3 m wide (Bidhimala Rule 53(10))"
+    title_bn: "গাড়ির র‍্যাম্প কমপক্ষে 3 m চওড়া (বিধিমালার বিধি 53(10))"
     parameters: [ramp_width_m]
     logic: "ramp_width_m >= 3"
     severity: Medium
     confidence_basis: "Verbatim Rule 53(10) (page image, PDF p.68 / gazette p.13476): 'একমুখী গাড়ি চলাচলের র‍্যাম্পের ক্ষেত্রে ন্যূনতম প্রস্থ ৩ মিটার এবং উভয়মুখী গাড়ী চলাচলের র‍্যাম্পের ক্ষেত্রে ন্যূনতম প্রস্থ সাধারণ গাড়ীর ক্ষেত্রে ৪.২৫ মিটার এবং অন্যান্য ক্ষেত্রে ৬ মিটার হইতে হইবে' (one-way ramp at least 3 m; two-way 4.25 m for ordinary cars, 6 m otherwise). Only the 3 m floor is encoded, because one-way vs two-way is not reliably readable; a two-way ramp between 3 and 4.25 m passes here. [VERIFY]"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 53(10)"
     remediation: "Widen the ramp to at least 3 m (4.25 m if two-way for ordinary cars)."
+    remediation_bn: "র‍্যাম্প কমপক্ষে 3 m চওড়া করুন (সাধারণ গাড়ির দুই-মুখী র‍্যাম্প হলে 4.25 m)।"
     verify_flag: true
     display:
       kind: compare
       fix_on: ground_floor
       headline_fail: "Car ramp is narrower than 3 m"
+      headline_fail_bn: "গাড়ির র‍্যাম্প 3 m-এর চেয়ে সরু"
       headline_pass: "Car ramp width appears to meet the one-way minimum"
+      headline_pass_bn: "গাড়ির র‍্যাম্পের প্রস্থ এক-মুখী র‍্যাম্পের ন্যূনতম মান পূরণ করে বলে মনে হচ্ছে"
       action: "Widen the ramp by {gap} to at least {limit} (4.25 m if two-way)."
+      action_bn: "র‍্যাম্প {gap} চওড়া করে কমপক্ষে {limit} করুন (দুই-মুখী হলে 4.25 m)।"
       rows:
         - {found: ramp_width_m, limit: 3, direction: min}
 
   - id: RAJUK-PARKHEIGHT-030
     title: "Parking and ramp clear height at least 2.25 m (Bidhimala Rule 53(12))"
+    title_bn: "পার্কিং ও র‍্যাম্পের বাধামুক্ত উচ্চতা কমপক্ষে 2.25 m (বিধিমালার বিধি 53(12))"
     parameters: [parking_clear_height_m]
     logic: "parking_clear_height_m >= 2.25"
     severity: Medium
     confidence_basis: "Verbatim Rule 53(12) (page image, PDF p.68 / gazette p.13476): 'পার্কিং স্থান এবং র‍্যাম্পের বাঁধামুক্ত উচ্চতা কমপক্ষে ২.২৫ মিটার হইতে হইবে' (parking space and ramp clear height at least 2.25 m). [VERIFY]"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 53(12)"
     remediation: "Raise the parking floor clear height (below beams) to at least 2.25 m."
+    remediation_bn: "পার্কিং তলার বাধামুক্ত উচ্চতা (বিমের নিচে) কমপক্ষে 2.25 m করুন।"
     verify_flag: true
     display:
       kind: compare
       fix_on: sections_elevations
       headline_fail: "Parking clear height is below 2.25 m"
+      headline_fail_bn: "পার্কিংয়ের বাধামুক্ত উচ্চতা 2.25 m-এর চেয়ে কম"
       headline_pass: "Parking clear height appears to meet the minimum"
+      headline_pass_bn: "পার্কিংয়ের বাধামুক্ত উচ্চতা ন্যূনতম মান পূরণ করে বলে মনে হচ্ছে"
       action: "Raise the parking clear height by {gap} to at least {limit}."
+      action_bn: "পার্কিংয়ের বাধামুক্ত উচ্চতা {gap} বাড়িয়ে কমপক্ষে {limit} করুন।"
       rows:
         - {found: parking_clear_height_m, limit: 2.25, direction: min}
 
   - id: RAJUK-TREE-031
     title: "Tree planting on at least 10% of plots over 1340 m2 (Bidhimala Rule 55(1))"
+    title_bn: "1340 m²-এর বেশি প্লটে কমপক্ষে 10% জায়গায় বৃক্ষরোপণ (বিধিমালার বিধি 55(1))"
     parameters: [plot_area_m2, tree_planting_area_m2]
     applies_if:
       params: [plot_area_m2]
       when: "plot_area_m2 > 1340"
       not_applicable: "Tree planting is required only on plots over 1340 m² (20 katha)."
+      not_applicable_bn: "বৃক্ষরোপণ শুধু 1340 m² (20 কাঠা)-এর বেশি প্লটে লাগে।"
     logic: "plot_area_m2 <= 1340 or tree_planting_area_m2 >= plot_area_m2 * 10 / 100"
     severity: Low
     confidence_basis: "Verbatim Rule 55(1) (page image, PDF p.71 / gazette p.13479): 'প্লটের পরিমাণ ১৩৪০ বর্গ মিটার (২০ কাঠা) এর অধিক হইলে প্লটের ন্যূনতম ১০% জায়গায় আবশ্যিকভাবে বৃক্ষরোপণ করিতে হইবে' (plot over 1340 m2 / 20 katha: tree planting on at least 10% of the plot). Rule 55(3) prints the same 1340 m2 as '১৪ কাঠা'; 1340 m2 is about 20 katha, so 55(1) is followed (gazette defect, brief Q). [VERIFY]"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 55(1)"
     remediation: "Set aside at least 10% of the plot for tree planting (in up to two parts, none smaller than one third)."
+    remediation_bn: "প্লটের কমপক্ষে 10% বৃক্ষরোপণের জন্য রাখুন (সর্বোচ্চ দুই ভাগে, কোনো ভাগ এক-তৃতীয়াংশের কম নয়)।"
     verify_flag: true
     display:
       kind: compare
       fix_on: layout_far_sheet
       headline_fail: "Tree planting area is below 10% of the plot"
+      headline_fail_bn: "বৃক্ষরোপণের জায়গা প্লটের 10%-এর কম"
       headline_pass: "Tree planting area appears to meet 10% of the plot"
+      headline_pass_bn: "বৃক্ষরোপণের জায়গা প্লটের 10% পূরণ করে বলে মনে হচ্ছে"
       action: "Add {gap} of tree planting area, to at least {limit}."
+      action_bn: "আরও {gap} বৃক্ষরোপণের জায়গা রাখুন, মোট কমপক্ষে {limit}।"
       rows:
         - {found: tree_planting_area_m2, limit: "plot_area_m2 * 10 / 100", direction: min, when: "plot_area_m2 > 1340"}
 
   - id: RAJUK-COMMUNITY-032
     title: "Community space at least 5% of FAR area above 3000 m2 (Bidhimala Rule 57(f)(1))"
+    title_bn: "FAR এরিয়া 3000 m²-এর বেশি হলে কমপক্ষে 5% কমিউনিটি স্পেস (বিধিমালার বিধি 57(f)(1))"
     parameters: [total_floor_area_m2, community_space_m2]
     applies_if:
       params: [total_floor_area_m2]
       when: "total_floor_area_m2 > 3000"
       not_applicable: "Community space is required only when the FAR-included floor area is over 3000 m²."
+      not_applicable_bn: "কমিউনিটি স্পেস শুধু তখনই লাগে, যখন FAR-ভুক্ত ফ্লোর এরিয়া 3000 m²-এর বেশি।"
     logic: "total_floor_area_m2 <= 3000 or community_space_m2 >= total_floor_area_m2 * 5 / 100"
     severity: Low
     confidence_basis: "Verbatim Rule 57(f)(1) (page image, PDF p.76 / gazette p.13484): 'FAR এর আওতাভুক্ত সর্বমোট ৩০০০ (তিন হাজার) বর্গমিটারের অধিক ক্ষেত্রফলবিশিষ্ট আবাসিক ভবনে বসবাসকারীদের ব্যবহারের জন্য FAR-ভুক্ত মেঝের আয়তনের ন্যূনতম ৫% স্থান ... কমিউনিটি স্পেস হিসাবে রাখিতে হইবে' (residential building with more than 3000 m2 of FAR-included floor: at least 5% of the FAR-included floor as community space). [VERIFY]"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 57(f)(1)"
     remediation: "Provide community space of at least 5% of the FAR-included floor area."
+    remediation_bn: "FAR-ভুক্ত ফ্লোর এরিয়ার কমপক্ষে 5% কমিউনিটি স্পেস দিন।"
     verify_flag: true
     display:
       kind: compare
       fix_on: ground_floor
       headline_fail: "Community space is below 5% of the FAR area"
+      headline_fail_bn: "কমিউনিটি স্পেস FAR এরিয়ার 5%-এর কম"
       headline_pass: "Community space appears to meet 5% of the FAR area"
+      headline_pass_bn: "কমিউনিটি স্পেস FAR এরিয়ার 5% পূরণ করে বলে মনে হচ্ছে"
       action: "Add {gap} of community space, to at least {limit}."
+      action_bn: "আরও {gap} কমিউনিটি স্পেস দিন, মোট কমপক্ষে {limit}।"
       rows:
         - {found: community_space_m2, limit: "total_floor_area_m2 * 5 / 100", direction: min, when: "total_floor_area_m2 > 3000"}
 
   - id: RAJUK-PLAY-033
     title: "Play area at least 10% of land of 1300 m2 or more (Bidhimala Rule 57(f)(2))"
+    title_bn: "1300 m² বা তার বেশি জমিতে কমপক্ষে 10% খেলার জায়গা (বিধিমালার বিধি 57(f)(2))"
     parameters: [plot_area_m2, play_area_m2]
     applies_if:
       params: [plot_area_m2]
       when: "plot_area_m2 >= 1300"
       not_applicable: "A play area is required only on residential land of 1300 m² or more."
+      not_applicable_bn: "খেলার জায়গা শুধু 1300 m² বা তার বেশি আবাসিক জমিতে লাগে।"
     logic: "plot_area_m2 < 1300 or play_area_m2 >= plot_area_m2 * 10 / 100"
     severity: Low
     confidence_basis: "Verbatim Rule 57(f)(2) (page image, PDF p.77 / gazette p.13485): 'ব্লক ভিত্তিক উন্নয়ন ব্যতীত ১৩০০ (এক হাজার তিনশত) বর্গমিটার বা তদূর্ধ্ব পরিমাণের আবাসিক জমিতে এ্যাপার্টমেন্ট নির্মাণ করিতে চাহিলে সম্পূর্ণ জমির অন্তত ১০% ... খেলার জায়গা হিসাবে ... রাখিতে হইবে' (apartments on residential land of 1300 m2 or more, other than block-based development: at least 10% of the land as a play area; setback space may count). Block-based development is not readable from a sheet and is not exempted here. [VERIFY]"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 57(f)(2)"
     remediation: "Set aside at least 10% of the land as a play area for residents (half may be covered, unenclosed)."
+    remediation_bn: "জমির কমপক্ষে 10% বাসিন্দাদের খেলার জায়গা হিসেবে রাখুন (অর্ধেক ছাদযুক্ত হতে পারে, তবে ঘেরা নয়)।"
     verify_flag: true
     display:
       kind: compare
       fix_on: layout_far_sheet
       headline_fail: "Play area is below 10% of the land"
+      headline_fail_bn: "খেলার জায়গা জমির 10%-এর কম"
       headline_pass: "Play area appears to meet 10% of the land"
+      headline_pass_bn: "খেলার জায়গা জমির 10% পূরণ করে বলে মনে হচ্ছে"
       action: "Add {gap} of play area, to at least {limit}."
+      action_bn: "আরও {gap} খেলার জায়গা রাখুন, মোট কমপক্ষে {limit}।"
       rows:
         - {found: play_area_m2, limit: "plot_area_m2 * 10 / 100", direction: min, when: "plot_area_m2 >= 1300"}
 
   - id: RAJUK-BOUNDARYWALL-034
     title: "Boundary wall at most 3 m, solid part at most 1.75 m (Bidhimala Rule 61(b)(1))"
+    title_bn: "সীমানা প্রাচীর সর্বোচ্চ 3 m, নিরেট অংশ সর্বোচ্চ 1.75 m (বিধিমালার বিধি 61(b)(1))"
     parameters: [boundary_wall_height_m, boundary_wall_solid_height_m]
     logic: "boundary_wall_height_m <= 3 and boundary_wall_solid_height_m <= 1.75"
     severity: Low
     confidence_basis: "Verbatim Rule 61(b)(1) (page image, PDF p.81 / gazette p.13489): 'আবাসিক ভবনের ক্ষেত্রে প্লটের সকল পার্শ্বস্থ সীমানা দেয়ালের উচ্চতা ৩ (তিন) মিটারের অধিক হইতে পারিবে না যাহা সংলগ্ন রাস্তার সর্বোচ্চ বিন্দু হইতে পরিমাপকৃত হইবে এবং সর্বোচ্চ ১.৭৫ মিটার উচ্চতা পর্যন্ত নিরেট ও বাকি অংশ বায়ু চলাচলের জন্য জালি অথবা গ্রিল করা যাইবে' (residential boundary walls at most 3 m from the highest point of the adjoining road; solid up to 1.75 m, the rest lattice or grille). [VERIFY]"
     citation: "Imarat Nirman Bidhimala 2025 (gazette 2025-12-14) Rule 61(b)(1)"
     remediation: "Keep the boundary wall to 3 m overall, solid only up to 1.75 m, with lattice or grille above."
+    remediation_bn: "সীমানা প্রাচীর মোট 3 m-এর মধ্যে রাখুন, নিরেট অংশ শুধু 1.75 m পর্যন্ত, তার ওপরে জালি বা গ্রিল।"
     verify_flag: true
     display:
       kind: compare
       fix_on: other
       headline_fail: "Boundary wall is higher than allowed"
+      headline_fail_bn: "সীমানা প্রাচীর অনুমোদিত উচ্চতার চেয়ে বেশি"
       headline_pass: "Boundary wall height appears to be within the limits"
+      headline_pass_bn: "সীমানা প্রাচীরের উচ্চতা সীমার মধ্যে আছে বলে মনে হচ্ছে"
       rows:
-        - {found: boundary_wall_height_m, limit: 3, direction: max, action: "Lower the boundary wall by {gap} to at most {limit}."}
-        - {found: boundary_wall_solid_height_m, limit: 1.75, direction: max, action: "Lower the solid part by {gap} to at most {limit}; use lattice or grille above."}
+        - {found: boundary_wall_height_m, limit: 3, direction: max, action: "Lower the boundary wall by {gap} to at most {limit}.", action_bn: "সীমানা প্রাচীর {gap} কমিয়ে সর্বোচ্চ {limit} করুন।"}
+        - {found: boundary_wall_solid_height_m, limit: 1.75, direction: max, action: "Lower the solid part by {gap} to at most {limit}; use lattice or grille above.", action_bn: "নিরেট অংশ {gap} কমিয়ে সর্বোচ্চ {limit} করুন; ওপরে জালি বা গ্রিল দিন।"}
 
   - id: RAJUK-CROSSSHEET-013-PARKING
     scope: cross_sheet
     title: "Parking count consistency across all submission sheets"
+    title_bn: "সাবমিশনের সব শিটে পার্কিংয়ের সংখ্যা একই"
     parameters: ["parking_provided"]
     logic: "consistency(reads('parking_provided'))"
     severity: "Medium"
     confidence_basis: "cross-sheet reconciliation (FR-22) — flags when the parking count differs across the site plan, floor plans, and parking layout sheets of the same submission"
     citation: "N/A — internal consistency check across submission sheets, not a coded RAJUK/BNBC threshold"
     remediation: "Reconcile the stated parking count so every sheet in the submission (site plan, floor plans, parking layout) shows the same figure before resubmission."
+    remediation_bn: "আবার জমা দেওয়ার আগে পার্কিংয়ের সংখ্যা মিলিয়ে নিন, যাতে সাবমিশনের প্রতিটি শিটে (সাইট প্ল্যান, ফ্লোর প্ল্যান, পার্কিং লেআউট) একই সংখ্যা থাকে।"
     verify_flag: false
     display:
       kind: consistency
       fix_on: other
       headline_fail: "Values on the sheet disagree"
+      headline_fail_bn: "শিটের মানগুলো মিলছে না"
       headline_pass: "Parking count appears to agree across the sheets"
+      headline_pass_bn: "সব শিটে পার্কিংয়ের সংখ্যা মিলছে বলে মনে হচ্ছে"
       action: "Make every sheet in the set show the same parking count."
+      action_bn: "সেটের প্রতিটি শিটে একই পার্কিং সংখ্যা দেখান।"
       reads: parking_provided
 
 # ---------------------------------------------------------------------------
@@ -839,8 +1003,8 @@ lookups:
     min_one_car_from_road_width_m: 6.00
     # flat_area_max_m2 inclusive; null = no upper bound.
     slabs:
-      - {flat_area_max_m2: 60,   cars: 0,   per_units: 1,   note: "motorcycle parking only"}
-      - {flat_area_max_m2: 90,   cars: 1,   per_units: 4,   note: "1 per 4 units"}
-      - {flat_area_max_m2: 140,  cars: 1,   per_units: 2,   note: "1 per 2 units"}
-      - {flat_area_max_m2: 200,  cars: 2,   per_units: 3,   note: "2 per 3 units"}
-      - {flat_area_max_m2: null, cars: 105, per_units: 100, note: "1 per flat + 5% guest"}
+      - {flat_area_max_m2: 60,   cars: 0,   per_units: 1,   note: "motorcycle parking only", note_bn: "শুধু মোটরসাইকেল পার্কিং"}
+      - {flat_area_max_m2: 90,   cars: 1,   per_units: 4,   note: "1 per 4 units", note_bn: "প্রতি 4টি ফ্ল্যাটে 1টি"}
+      - {flat_area_max_m2: 140,  cars: 1,   per_units: 2,   note: "1 per 2 units", note_bn: "প্রতি 2টি ফ্ল্যাটে 1টি"}
+      - {flat_area_max_m2: 200,  cars: 2,   per_units: 3,   note: "2 per 3 units", note_bn: "প্রতি 3টি ফ্ল্যাটে 2টি"}
+      - {flat_area_max_m2: null, cars: 105, per_units: 100, note: "1 per flat + 5% guest", note_bn: "প্রতি ফ্ল্যাটে 1টি + 5% অতিথি"}
